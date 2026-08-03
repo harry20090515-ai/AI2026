@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부산 지역 컴퓨터공학 관련 대학 기초 통계 및 현황 분석 보고서 (2025)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Noto Sans KR Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#2563eb',
+                            600: '#1d4ed8',
+                            700: '#1e40af',
+                            900: '#1e3a8a',
+                        },
+                        accent: {
+                            500: '#06b6d4',
+                            600: '#0891b2',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Noto Sans KR', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8fafc; transition: background-color 0.3s ease, color 0.3s ease; }
+        .dark body { background-color: #0f172a; }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .dark .glass-card { background: rgba(30, 41, 59, 0.95); }
+        @media print {
+            .no-print { display: none !important; }
+            body { background-color: #ffffff !important; color: #000000 !important; }
+            .print-break { page-break-before: always; }
+            .shadow-lg, .shadow-md, .shadow-sm { box-shadow: none !important; }
+            .border { border-color: #cbd5e1 !important; }
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        .dark ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="text-slate-800 dark:text-slate-100 antialiased min-h-screen flex flex-col bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+
+    <!-- Sticky Navigation Bar -->
+    <header class="sticky top-0 z-50 bg-slate-900 text-white shadow-md no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- 로고 & 제목 (클릭 시 ../index.html 이동) -->
+                <a href="../index.html" class="flex items-center space-x-3 hover:opacity-90 transition group cursor-pointer">
+                    <span class="bg-blue-600 group-hover:bg-blue-500 text-white p-2 rounded-lg font-bold text-lg transition">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </span>
+                    <div>
+                        <h1 class="font-bold text-base sm:text-lg leading-tight">부산 CSE 교육 현황 보고서</h1>
+                        <p class="text-xs text-slate-400">2025년 고등교육 기초 통계 데이터</p>
+                    </div>
+                </a>
+                <!-- 데스크톱 네비게이션 메뉴 (홈 버튼 클릭 시 ../index.html 이동) -->
+                <nav class="hidden md:flex space-x-6 text-sm font-medium text-slate-300 items-center">
+                    <a href="../index.html" class="hover:text-white transition flex items-center gap-1.5 text-blue-400 font-semibold">
+                        <i class="fa-solid fa-house"></i> 홈
+                    </a>
+                    <a href="#summary" class="hover:text-white transition">요약</a>
+                    <a href="#table-section" class="hover:text-white transition">대학별 현황</a>
+                    <a href="#analytics-section" class="hover:text-white transition">시각화 분석</a>
+                    <a href="#district-section" class="hover:text-white transition">설립/지역 분석</a>
+                    <a href="#conclusion" class="hover:text-white transition">결론</a>
+                </nav>
+                <!-- 우측 상단 버튼 (모바일 홈 아이콘 & 다크 모드 토글) -->
+                <div class="flex items-center space-x-2">
+                    <a href="../index.html" class="md:hidden bg-slate-800 hover:bg-slate-700 text-slate-200 p-2 rounded-lg text-xs font-medium flex items-center border border-slate-700 transition" title="홈으로 이동">
+                        <i class="fa-solid fa-house"></i>
+                    </a>
+                    <button id="themeToggleBtn" onclick="toggleTheme()" class="bg-slate-800 hover:bg-slate-700 text-amber-400 dark:text-amber-300 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium flex items-center gap-2 border border-slate-700 transition shadow-sm">
+                        <i id="themeIcon" class="fa-solid fa-moon"></i>
+                        <span id="themeText" class="hidden sm:inline">다크 모드</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero / Title Header Section -->
+    <section class="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white py-12 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div class="max-w-3xl">
+                    <div class="inline-flex items-center gap-2 bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-3 border border-blue-500/30">
+                        <i class="fa-solid fa-chart-line"></i> 고등교육 통계 분석 레포트
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-3 leading-snug">
+                        부산 지역 컴퓨터공학 관련 대학<br class="hidden sm:inline"> 기초 통계 및 현황 분석 보고서 (2025)
+                    </h2>
+                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                        부산 지역 내 컴퓨터공학 및 AI 전공이 개설된 11개 대학의 교육 인프라, 학생 규모, 전임교원 분포를 다각도로 분석하여 지자체 정책 및 교육 산학 연계를 위한 기초 지표를 제공합니다.
+                    </p>
+                </div>
+                <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700/60 shadow-xl text-xs space-y-2 shrink-0">
+                    <div class="flex justify-between gap-4 text-slate-300">
+                        <span><i class="fa-regular fa-calendar-check text-blue-400 mr-1.5"></i>분석 기준년도:</span>
+                        <span class="font-bold text-white">2025년</span>
+                    </div>
+                    <div class="flex justify-between gap-4 text-slate-300">
+                        <span><i class="fa-solid fa-building-columns text-blue-400 mr-1.5"></i>조사 대상 기관:</span>
+                        <span class="font-bold text-white">11개 대학</span>
+                    </div>
+                    <div class="flex justify-between gap-4 text-slate-300">
+                        <span><i class="fa-solid fa-map-location-dot text-blue-400 mr-1.5"></i>지역 범위:</span>
+                        <span class="font-bold text-white">부산광역시 전역</span>
+                    </div>
+                    <div class="pt-2 border-t border-slate-700/60 flex justify-between gap-4 text-slate-400">
+                        <span>발행/작성:</span>
+                        <span class="text-slate-200 font-medium">지역고등교육정책연구</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10 flex-grow">
+
+        <!-- Key Metrics Cards -->
+        <section id="summary" class="scroll-mt-20">
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-layer-group text-blue-600"></i> 핵심 기초 통계 지표 (11개 대학 총계 및 평균)
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Card 1 -->
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">입학정원 합계</span>
+                        <span class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-user-plus"></i>
+                        </span>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">27,054</span>
+                        <span class="text-xs text-slate-500 dark:text-slate-400">명</span>
+                    </div>
+                    <p class="text-xs text-blue-600 dark:text-blue-400 font-medium mt-2 bg-blue-50/80 dark:bg-blue-900/30 px-2.5 py-1 rounded-md inline-block">
+                        <i class="fa-solid fa-calculator mr-1"></i> 대학당 평균 2,459명
+                    </p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">재학생수 합계</span>
+                        <span class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-users"></i>
+                        </span>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">118,001</span>
+                        <span class="text-xs text-slate-500 dark:text-slate-400">명</span>
+                    </div>
+                    <p class="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-2 bg-emerald-50/80 dark:bg-emerald-900/30 px-2.5 py-1 rounded-md inline-block">
+                        <i class="fa-solid fa-calculator mr-1"></i> 대학당 평균 10,727명
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">전임교원수 합계</span>
+                        <span class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-chalkboard-user"></i>
+                        </span>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">5,140</span>
+                        <span class="text-xs text-slate-500 dark:text-slate-400">명</span>
+                    </div>
+                    <p class="text-xs text-indigo-600 dark:text-indigo-400 font-medium mt-2 bg-indigo-50/80 dark:bg-indigo-900/30 px-2.5 py-1 rounded-md inline-block">
+                        <i class="fa-solid fa-calculator mr-1"></i> 대학당 평균 467명
+                    </p>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">졸업생수 합계</span>
+                        <span class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-user-graduate"></i>
+                        </span>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">26,825</span>
+                        <span class="text-xs text-slate-500 dark:text-slate-400">명</span>
+                    </div>
+                    <p class="text-xs text-amber-600 dark:text-amber-400 font-medium mt-2 bg-amber-50/80 dark:bg-amber-900/30 px-2.5 py-1 rounded-md inline-block">
+                        <i class="fa-solid fa-calculator mr-1"></i> 대학당 평균 2,439명
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1. Introduction Section -->
+        <section class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm space-y-4">
+            <div class="flex items-center gap-3 pb-3 border-b border-slate-100 dark:border-slate-700">
+                <span class="bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-extrabold text-sm px-2.5 py-1 rounded-md">01</span>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white">서론: 보고서 개요 및 목적</h3>
+            </div>
+            <p class="text-slate-600 dark:text-slate-300 leading-relaxed text-sm sm:text-base">
+                본 보고서는 부산 지역 내 컴퓨터공학 및 관련 전공이 개설된 <strong class="text-slate-900 dark:text-white font-semibold">11개 대학</strong>을 대상으로 고등교육 기초 통계 데이터를 분석한 결과입니다. 
+                최근 산업 전반의 디지털 전환(Digital Transformation)에 따라 IT 전문 인력 양성의 중요성이 가증되는 가운데, 지역 내 고등교육 기관의 전공 개설 현황과 교육 자원 분포를 객관적으로 파악함으로써 <strong class="text-blue-700 dark:text-blue-400 font-semibold">향후 지역 교육 정책 수립 및 산학 연계를 위한 기초 데이터</strong>를 제공하는 데 목적이 있습니다.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                <div class="bg-slate-50 dark:bg-slate-700/40 p-4 rounded-xl border border-slate-100 dark:border-slate-700 flex items-start gap-3">
+                    <i class="fa-solid fa-microchip text-blue-600 dark:text-blue-400 text-xl mt-1"></i>
+                    <div>
+                        <h4 class="font-semibold text-slate-800 dark:text-slate-200 text-sm">IT 인재 양성 거점 파악</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">지역 IT 산업 생태계를 받치는 고등교육 인프라 역량 측정</p>
+                    </div>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-700/40 p-4 rounded-xl border border-slate-100 dark:border-slate-700 flex items-start gap-3">
+                    <i class="fa-solid fa-scale-balanced text-emerald-600 dark:text-emerald-400 text-xl mt-1"></i>
+                    <div>
+                        <h4 class="font-semibold text-slate-800 dark:text-slate-200 text-sm">자원 불균형 진단</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">국립 및 사립, 지역구별 교육 자원 편중 현상 정량 분석</p>
+                    </div>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-700/40 p-4 rounded-xl border border-slate-100 dark:border-slate-700 flex items-start gap-3">
+                    <i class="fa-solid fa-lightbulb text-amber-600 dark:text-amber-400 text-xl mt-1"></i>
+                    <div>
+                        <h4 class="font-semibold text-slate-800 dark:text-slate-200 text-sm">맞춤형 지원 전략 제언</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">대학 규모와 지리적 특성을 고려한 맞춤형 고등교육 정책 수립</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2 & 3. Data Table Section -->
+        <section id="table-section" class="scroll-mt-20 bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-700">
+                <div class="flex items-center gap-3">
+                    <span class="bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-extrabold text-sm px-2.5 py-1 rounded-md">02</span>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white">부산 지역 대학별 기초 통계 현황 (2025)</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">컬럼 제목을 클릭하면 오름차순/내림차순으로 정렬됩니다.</p>
+                    </div>
+                </div>
+                <!-- Controls: Filter & Search -->
+                <div class="flex flex-wrap items-center gap-2 no-print">
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="대학명/학과/구 검색..." 
+                            class="pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 w-44 sm:w-56">
+                    </div>
+                    <select id="typeFilter" onchange="filterTable()" class="px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200">
+                        <option value="ALL">설립유형: 전체</option>
+                        <option value="국립">국립</option>
+                        <option value="사립">사립</option>
+                    </select>
+                    <select id="districtFilter" onchange="filterTable()" class="px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200">
+                        <option value="ALL">지역구: 전체</option>
+                        <option value="남구">남구</option>
+                        <option value="금정구">금정구</option>
+                        <option value="사상구">사상구</option>
+                        <option value="사하구">사하구</option>
+                        <option value="영도구">영도구</option>
+                        <option value="부산진구">부산진구</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Table Container -->
+            <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+                <table class="w-full text-left border-collapse text-xs sm:text-sm" id="univTable">
+                    <thead>
+                        <tr class="bg-slate-100 dark:bg-slate-700/80 text-slate-700 dark:text-slate-200 font-semibold border-b border-slate-200 dark:border-slate-600">
+                            <th class="p-3 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-600 transition" onclick="sortTable(0)">
+                                대학명 <i class="fa-solid fa-sort text-slate-400 ml-1"></i>
+                            </th>
+                            <th class="p-3">개설 학과(전공)명</th>
+                            <th class="p-3 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-600 transition" onclick="sortTable(2)">
+                                소재지 <i class="fa-solid fa-sort text-slate-400 ml-1"></i>
+                            </th>
+                            <th class="p-3 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-600 transition text-center" onclick="sortTable(3)">
+                                설립유형 <i class="fa-solid fa-sort text-slate-400 ml-1"></i>
+                            </th>
+                            <th class="p-3 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-600 transition text-right" onclick="sortTable(4)">
+                                입학정원 <i class="fa-solid fa-sort text-slate-400 ml-1"></i>
+                            </th>
+                            <th class="p-3 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-600 transition text-right" onclick="sortTable(5)">
+                                재학생수 <i class="fa-solid fa-sort text-slate-400 ml-1"></i>
+                            </th>
+                            <th class="p-3 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-600 transition text-right" onclick="sortTable(6)">
+                                전임교원수 <i class="fa-solid fa-sort text-slate-400 ml-1"></i>
+                            </th>
+                            <th class="p-3 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-600 transition text-right" onclick="sortTable(7)">
+                                졸업생수 <i class="fa-solid fa-sort text-slate-400 ml-1"></i>
+                            </th>
+                            <th class="p-3 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-600 transition text-right text-blue-700 dark:text-blue-400" onclick="sortTable(8)">
+                                교원 1인당 학생수 <i class="fa-solid fa-sort text-slate-400 ml-1"></i>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 dark:divide-slate-700 text-slate-700 dark:text-slate-200" id="tableBody">
+                        <!-- Javascript filled rows -->
+                    </tbody>
+                    <tfoot class="bg-slate-900 text-white font-bold border-t-2 border-slate-800" id="tableFooter">
+                        <!-- Total & Average row -->
+                    </tfoot>
+                </table>
+            </div>
+            <div class="text-xs text-slate-500 dark:text-slate-400 flex justify-between items-center px-1">
+                <span>* 국립부경대학교, 동서대학교, 부산대학교는 동일 대학 내 복수의 관련 전공을 운영 중입니다.</span>
+                <span id="filteredCount">총 11개 대학 표시 중</span>
+            </div>
+        </section>
+
+        <!-- 4. Visual Analytics Section (Charts) -->
+        <section id="analytics-section" class="scroll-mt-20 space-y-6">
+            <div class="flex items-center gap-3">
+                <span class="bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-extrabold text-sm px-2.5 py-1 rounded-md">03</span>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white">시각화 분석 대시보드</h3>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Chart 1: University Scale Comparison -->
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm sm:text-base flex items-center gap-2">
+                            <i class="fa-solid fa-chart-bar text-blue-600 dark:text-blue-400"></i> 대학별 학생 규모 비교 (입학정원 vs 재학생수)
+                        </h4>
+                    </div>
+                    <div class="h-72">
+                        <canvas id="scaleChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Faculty Count Breakdown -->
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm sm:text-base flex items-center gap-2">
+                            <i class="fa-solid fa-user-shield text-indigo-600 dark:text-indigo-400"></i> 대학별 전임교원수 비교 (교원 자원 분포)
+                        </h4>
+                    </div>
+                    <div class="h-72">
+                        <canvas id="facultyChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 3: Establishment Type Comparison -->
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm sm:text-base flex items-center gap-2">
+                            <i class="fa-solid fa-chart-pie text-emerald-600 dark:text-emerald-400"></i> 설립 유형별 (국립 vs 사립) 자원 비중
+                        </h4>
+                    </div>
+                    <div class="h-72 flex items-center justify-center">
+                        <canvas id="typeDoughnutChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 4: District Distribution -->
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm sm:text-base flex items-center gap-2">
+                            <i class="fa-solid fa-map-pin text-rose-500"></i> 소재지(구)별 대학 수 및 재학생 분포
+                        </h4>
+                    </div>
+                    <div class="h-72">
+                        <canvas id="districtChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Establishment and District Analysis Section -->
+        <section id="district-section" class="scroll-mt-20 bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm space-y-6">
+            <div class="flex items-center gap-3 pb-3 border-b border-slate-100 dark:border-slate-700">
+                <span class="bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-extrabold text-sm px-2.5 py-1 rounded-md">04</span>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white">설립 유형 및 지역구별 심층 특성 분석</h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Establishment Analysis Card -->
+                <div class="bg-slate-50 dark:bg-slate-700/40 p-6 rounded-xl border border-slate-200 dark:border-slate-700 space-y-4">
+                    <div class="flex items-center gap-3 text-blue-900 dark:text-blue-300 font-bold text-base">
+                        <div class="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center text-sm">1</div>
+                        <h4>설립 유형별 분포 및 자원 편중 현상</h4>
+                    </div>
+                    <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+                        부산 지역 내 컴퓨터공학 관련 교육 기관은 <strong class="text-slate-900 dark:text-white">국립 대학 3개교</strong>(국립부경대, 국립한국해양대, 부산대)와 <strong class="text-slate-900 dark:text-white">사립 대학 8개교</strong>(경성대, 동명대, 동서대, 동아대, 동의대, 부산가톨릭대, 부산외대, 신라대)로 구성되어 있습니다.
+                    </p>
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-lg border border-slate-200 dark:border-slate-700 space-y-3">
+                        <div class="flex justify-between items-center text-xs font-semibold text-slate-700 dark:text-slate-300">
+                            <span>전임교원 집중도 (부산대 vs 사립 최대 동아대)</span>
+                            <span class="text-blue-600 dark:text-blue-400">약 2.02배 격차</span>
+                        </div>
+                        <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3 overflow-hidden flex">
+                            <div class="bg-blue-600 h-full" style="width: 66.8%" title="부산대 (1,442명)"></div>
+                            <div class="bg-indigo-400 h-full" style="width: 33.2%" title="동아대 (715명)"></div>
+                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">
+                            <strong>부산대학교(국립 거점)</strong>의 전임교원수(1,442명)는 사립 대학 중 최대 규모인 동아대학교(715명)의 약 2배에 달하며, 거점 국립대로의 교육 인프라 및 자원 집중 현상이 정량적으로 확인됩니다.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- District Density Analysis Card -->
+                <div class="bg-slate-50 dark:bg-slate-700/40 p-6 rounded-xl border border-slate-200 dark:border-slate-700 space-y-4">
+                    <div class="flex items-center gap-3 text-blue-900 dark:text-blue-300 font-bold text-base">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-sm">2</div>
+                        <h4>지역구별 교육 인프라 밀집도 분석</h4>
+                    </div>
+                    <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+                        소재지별 분석 결과, <strong class="text-slate-900 dark:text-white">남구</strong>(경성대, 국립부경대, 동명대)와 <strong class="text-slate-900 dark:text-white">금정구</strong>(부산가톨릭대, 부산대, 부산외대)에 각각 3개교씩 분포하여 부산 전체 IT 교육 인프라의 <strong class="text-emerald-700 dark:text-emerald-400">54.5%(6개교)</strong>가 두 지역구에 밀집해 있습니다.
+                    </p>
+
+                    <!-- District Breakdown Pills -->
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                            <span class="font-medium text-slate-700 dark:text-slate-300"><i class="fa-solid fa-location-dot text-rose-500 mr-1"></i> 남구 (3개교)</span>
+                            <span class="bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 font-bold px-2 py-0.5 rounded">27.3%</span>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                            <span class="font-medium text-slate-700 dark:text-slate-300"><i class="fa-solid fa-location-dot text-rose-500 mr-1"></i> 금정구 (3개교)</span>
+                            <span class="bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 font-bold px-2 py-0.5 rounded">27.3%</span>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                            <span class="font-medium text-slate-700 dark:text-slate-300"><i class="fa-solid fa-location-dot text-slate-400 mr-1"></i> 사상구 (2개교)</span>
+                            <span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-2 py-0.5 rounded">18.2%</span>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                            <span class="font-medium text-slate-700 dark:text-slate-300"><i class="fa-solid fa-location-dot text-slate-400 mr-1"></i> 기타 3개 구 (각 1개)</span>
+                            <span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-2 py-0.5 rounded">27.3%</span>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">
+                        영도구(한국해양대), 사하구(동아대), 부산진구(동의대) 순으로 분산되어 있어, 동남권 산학클러스터 및 지역별 산업 단지 연계 시 공간적 불균형을 고려할 필요가 있습니다.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. Conclusion and Strategic Policy Recommendations -->
+        <section id="conclusion" class="scroll-mt-20 bg-gradient-to-br from-slate-900 to-blue-950 text-white p-6 sm:p-8 rounded-2xl shadow-xl space-y-6">
+            <div class="flex items-center gap-3 pb-4 border-b border-slate-800">
+                <span class="bg-blue-500 text-white font-extrabold text-sm px-2.5 py-1 rounded-md">05</span>
+                <h3 class="text-xl font-bold text-white">종합 결론 및 정책 제언</h3>
+            </div>
+
+            <div class="space-y-4 text-slate-300 text-sm sm:text-base leading-relaxed">
+                <p>
+                    2025년 기준 부산 지역 컴퓨터공학 관련 대학은 연간 <strong class="text-white font-semibold">약 27,000명의 입학 자원</strong>과 <strong class="text-white font-semibold">11만 8천 명의 재학생 규모</strong>를 유지하며 지역 내 핵심 신산업 인재 양성의 요람 역할을 수행하고 있습니다.
+                </p>
+                <p>
+                    분석 결과, 교육 인프라 측면에서는 <strong class="text-blue-300 font-semibold">남구와 금정구</strong>가 전체 대학의 절반 이상을 차지하며 IT 인재 양성의 핵심 거점으로 작용하고 있습니다. 한편 자원 배분 측면에서는 부산대학교를 중심으로 한 국립 대학의 교육 및 연구 인프라 비중이 압도적으로 높게 나타나, 기관 간 역량 편차를 완화할 수 있는 정교한 지자체 주도 고등교육 지원 정책이 요구됩니다.
+                </p>
+            </div>
+
+            <!-- Actionable Recommendations Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-800/80">
+                <div class="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50 space-y-2">
+                    <div class="text-blue-400 font-bold text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-network-wired"></i> 1. 권역별 IT 특화 클러스터 구축
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        남구·금정구의 인프라 밀집도를 활용하여 대학 간 전공 공유 대학(Consortium) 및 공동 연구센터 설립 활성화.
+                    </p>
+                </div>
+
+                <div class="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50 space-y-2">
+                    <div class="text-emerald-400 font-bold text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-hands-holding-circle"></i> 2. 국·사립 상생 교육 자원 공유
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        부산대 등 거점 국립대의 풍부한 교원 자원과 연구 장비를 사립대와 공유하는 교류형 산학협력 바우처 제도 도입.
+                    </p>
+                </div>
+
+                <div class="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50 space-y-2">
+                    <div class="text-amber-400 font-bold text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-bullseye"></i> 3. 지역 산업 맞춤형 인재 매칭
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        연간 2만 6천여 명의 졸업생 자원이 역외로 유출되지 않도록 부산 디지털 혁신거점(센텀 등)과 연계한 취업 트랙 강화.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-8 border-t border-slate-800 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+                <p class="font-medium text-slate-300">2025 부산 지역 컴퓨터공학 관련 대학 기초 통계 보고서</p>
+                <p class="text-slate-500 mt-1">출처: 2025년 부산 고등교육 기초 통계 데이터베이스</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition">
+                    <i class="fa-solid fa-arrow-up mr-1"></i> 맨 위로
+                </button>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let chartInstances = {};
+
+        // Theme Toggle Handler
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeUI(isDark);
+            updateChartThemes(isDark);
+        }
+
+        function updateThemeUI(isDark) {
+            const btnIcon = document.getElementById('themeIcon');
+            const btnText = document.getElementById('themeText');
+            if (isDark) {
+                btnIcon.className = 'fa-solid fa-sun';
+                btnText.innerText = '라이트 모드';
+            } else {
+                btnIcon.className = 'fa-solid fa-moon';
+                btnText.innerText = '다크 모드';
+            }
+        }
+
+        function updateChartThemes(isDark) {
+            const textColor = isDark ? '#cbd5e1' : '#475569';
+            const gridColor = isDark ? '#334155' : '#f1f5f9';
+
+            Object.values(chartInstances).forEach(chart => {
+                if (!chart) return;
+                if (chart.options.scales) {
+                    if (chart.options.scales.x) {
+                        if (chart.options.scales.x.ticks) chart.options.scales.x.ticks.color = textColor;
+                        if (chart.options.scales.x.grid) chart.options.scales.x.grid.color = gridColor;
+                    }
+                    if (chart.options.scales.y) {
+                        if (chart.options.scales.y.ticks) chart.options.scales.y.ticks.color = textColor;
+                        if (chart.options.scales.y.grid) chart.options.scales.y.grid.color = gridColor;
+                    }
+                }
+                if (chart.options.plugins && chart.options.plugins.legend && chart.options.plugins.legend.labels) {
+                    chart.options.plugins.legend.labels.color = textColor;
+                }
+                if (chart.options.plugins && chart.options.plugins.title) {
+                    chart.options.plugins.title.color = textColor;
+                }
+                chart.update();
+            });
+        }
+
+        // Data model
+        const rawData = [
+            { id: 1, name: "경성대학교", dept: "컴퓨터공학과", district: "남구", type: "사립", quota: 2765, enrolled: 12568, faculty: 363, grad: 2529 },
+            { id: 2, name: "국립부경대학교", dept: "컴퓨터・인공지능공학부, 컴퓨터공학전공", district: "남구", type: "국립", quota: 3338, enrolled: 15131, faculty: 630, grad: 3713 },
+            { id: 3, name: "국립한국해양대학교", dept: "인공지능공학부(컴퓨터공학전공)", district: "영도구", type: "국립", quota: 1372, enrolled: 6326, faculty: 282, grad: 1421 },
+            { id: 4, name: "동명대학교", dept: "컴퓨터공학과", district: "남구", type: "사립", quota: 1424, enrolled: 6761, faculty: 229, grad: 1617 },
+            { id: 5, name: "동서대학교", dept: "컴퓨터공학부, 컴퓨터공학전공", district: "사상구", type: "사립", quota: 2094, enrolled: 8582, faculty: 320, grad: 1948 },
+            { id: 6, name: "동아대학교", dept: "컴퓨터공학과", district: "사하구", type: "사립", quota: 4159, enrolled: 17634, faculty: 715, grad: 4167 },
+            { id: 7, name: "동의대학교", dept: "컴퓨터공학과", district: "부산진구", type: "사립", quota: 3589, enrolled: 14302, faculty: 550, grad: 3216 },
+            { id: 8, name: "부산가톨릭대학교", dept: "컴퓨터정보공학과", district: "금정구", type: "사립", quota: 705, enrolled: 3449, faculty: 123, grad: 870 },
+            { id: 9, name: "부산대학교", dept: "정보컴퓨터공학부, 정보컴퓨터공학부 컴퓨터공학전공", district: "금정구", type: "국립", quota: 4498, enrolled: 19900, faculty: 1442, grad: 4294 },
+            { id: 10, name: "부산외국어대학교", dept: "컴퓨터공학전공", district: "금정구", type: "사립", quota: 1470, enrolled: 6471, faculty: 214, grad: 1516 },
+            { id: 11, name: "신라대학교", dept: "컴퓨터공학과", district: "사상구", type: "사립", quota: 1640, enrolled: 6877, faculty: 272, grad: 1534 }
+        ];
+
+        let currentData = [...rawData];
+        let sortDirection = {};
+
+        // Render Table Function
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            data.forEach(item => {
+                const ratio = (item.enrolled / item.faculty).toFixed(1);
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-blue-50/50 dark:hover:bg-slate-700/50 transition border-b border-slate-100 dark:border-slate-700/60';
+                tr.innerHTML = `
+                    <td class="p-3 font-semibold text-slate-900 dark:text-slate-100">${item.name}</td>
+                    <td class="p-3 text-slate-600 dark:text-slate-300">${item.dept}</td>
+                    <td class="p-3"><span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded text-xs">${item.district}</span></td>
+                    <td class="p-3 text-center">
+                        <span class="px-2 py-0.5 rounded text-xs font-semibold ${item.type === '국립' ? 'bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-300' : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'}">
+                            ${item.type}
+                        </span>
+                    </td>
+                    <td class="p-3 text-right font-mono">${item.quota.toLocaleString()}명</td>
+                    <td class="p-3 text-right font-mono">${item.enrolled.toLocaleString()}명</td>
+                    <td class="p-3 text-right font-mono">${item.faculty.toLocaleString()}명</td>
+                    <td class="p-3 text-right font-mono">${item.grad.toLocaleString()}명</td>
+                    <td class="p-3 text-right font-mono font-semibold text-blue-700 dark:text-blue-400 bg-blue-50/30 dark:bg-blue-900/20">${ratio}명</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Calculate Totals & Averages
+            const totalQuota = data.reduce((acc, curr) => acc + curr.quota, 0);
+            const totalEnrolled = data.reduce((acc, curr) => acc + curr.enrolled, 0);
+            const totalFaculty = data.reduce((acc, curr) => acc + curr.faculty, 0);
+            const totalGrad = data.reduce((acc, curr) => acc + curr.grad, 0);
+
+            const count = data.length || 1;
+            const avgQuota = Math.round(totalQuota / count);
+            const avgEnrolled = Math.round(totalEnrolled / count);
+            const avgFaculty = Math.round(totalFaculty / count);
+            const avgGrad = Math.round(totalGrad / count);
+            const avgRatio = (totalEnrolled / totalFaculty).toFixed(1);
+
+            const tfoot = document.getElementById('tableFooter');
+            tfoot.innerHTML = `
+                <tr class="border-t border-slate-800">
+                    <td class="p-3" colspan="4">합계 (Total)</td>
+                    <td class="p-3 text-right font-mono">${totalQuota.toLocaleString()}명</td>
+                    <td class="p-3 text-right font-mono">${totalEnrolled.toLocaleString()}명</td>
+                    <td class="p-3 text-right font-mono">${totalFaculty.toLocaleString()}명</td>
+                    <td class="p-3 text-right font-mono">${totalGrad.toLocaleString()}명</td>
+                    <td class="p-3 text-right font-mono text-blue-300">${avgRatio}명</td>
+                </tr>
+                <tr class="bg-slate-800 text-slate-300 font-medium">
+                    <td class="p-2.5" colspan="4">평균 (Average)</td>
+                    <td class="p-2.5 text-right font-mono">${avgQuota.toLocaleString()}명</td>
+                    <td class="p-2.5 text-right font-mono">${avgEnrolled.toLocaleString()}명</td>
+                    <td class="p-2.5 text-right font-mono">${avgFaculty.toLocaleString()}명</td>
+                    <td class="p-2.5 text-right font-mono">${avgGrad.toLocaleString()}명</td>
+                    <td class="p-2.5 text-right font-mono">-</td>
+                </tr>
+            `;
+
+            document.getElementById('filteredCount').innerText = `총 ${data.length}개 대학 표시 중`;
+        }
+
+        // Table Filtering Function
+        function filterTable() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const typeVal = document.getElementById('typeFilter').value;
+            const districtVal = document.getElementById('districtFilter').value;
+
+            currentData = rawData.filter(item => {
+                const matchesSearch = item.name.toLowerCase().includes(query) || 
+                                      item.dept.toLowerCase().includes(query) || 
+                                      item.district.toLowerCase().includes(query);
+                const matchesType = (typeVal === 'ALL') || (item.type === typeVal);
+                const matchesDistrict = (districtVal === 'ALL') || (item.district === districtVal);
+
+                return matchesSearch && matchesType && matchesDistrict;
+            });
+
+            renderTable(currentData);
+        }
+
+        // Table Sorting Function
+        function sortTable(colIndex) {
+            const keys = ['name', 'dept', 'district', 'type', 'quota', 'enrolled', 'faculty', 'grad', 'ratio'];
+            const key = keys[colIndex];
+            
+            sortDirection[key] = !sortDirection[key];
+
+            currentData.sort((a, b) => {
+                let valA = (key === 'ratio') ? (a.enrolled / a.faculty) : a[key];
+                let valB = (key === 'ratio') ? (b.enrolled / b.faculty) : b[key];
+
+                if (typeof valA === 'string') {
+                    return sortDirection[key] ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                } else {
+                    return sortDirection[key] ? valA - valB : valB - valA;
+                }
+            });
+
+            renderTable(currentData);
+        }
+
+        // Initialize Charts
+        function initCharts(isDark) {
+            const textColor = isDark ? '#cbd5e1' : '#475569';
+            const gridColor = isDark ? '#334155' : '#f1f5f9';
+            const labels = rawData.map(d => d.name.replace('대학교', '대').replace('국립', ''));
+
+            // Chart 1: Scale Comparison (Grouped Bar)
+            const ctx1 = document.getElementById('scaleChart').getContext('2d');
+            chartInstances.scaleChart = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '입학정원',
+                            data: rawData.map(d => d.quota),
+                            backgroundColor: '#3b82f6',
+                            borderRadius: 4
+                        },
+                        {
+                            label: '재학생수',
+                            data: rawData.map(d => d.enrolled),
+                            backgroundColor: '#10b981',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top', labels: { boxWidth: 12, color: textColor } } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } },
+                        x: { grid: { display: false }, ticks: { color: textColor } }
+                    }
+                }
+            });
+
+            // Chart 2: Faculty Count Comparison
+            const ctx2 = document.getElementById('facultyChart').getContext('2d');
+            chartInstances.facultyChart = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '전임교원수(명)',
+                        data: rawData.map(d => d.faculty),
+                        backgroundColor: rawData.map(d => d.name === '부산대학교' ? '#1d4ed8' : '#6366f1'),
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } },
+                        x: { grid: { display: false }, ticks: { color: textColor } }
+                    }
+                }
+            });
+
+            // Chart 3: Establishment Type Doughnut
+            const nationalCount = rawData.filter(d => d.type === '국립').length;
+            const privateCount = rawData.filter(d => d.type === '사립').length;
+            const ctx3 = document.getElementById('typeDoughnutChart').getContext('2d');
+            chartInstances.typeDoughnutChart = new Chart(ctx3, {
+                type: 'doughnut',
+                data: {
+                    labels: [`국립 대학 (${nationalCount}개교)`, `사립 대학 (${privateCount}개교)`],
+                    datasets: [{
+                        data: [
+                            rawData.filter(d => d.type === '국립').reduce((a, b) => a + b.enrolled, 0),
+                            rawData.filter(d => d.type === '사립').reduce((a, b) => a + b.enrolled, 0)
+                        ],
+                        backgroundColor: ['#2563eb', '#94a3b8'],
+                        borderWidth: 2,
+                        borderColor: isDark ? '#1e293b' : '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: textColor } },
+                        title: { display: true, text: '재학생 수 기준 설립유형 점유율', color: textColor }
+                    },
+                    cutout: '65%'
+                }
+            });
+
+            // Chart 4: District Distribution Bar
+            const districtMap = {};
+            rawData.forEach(d => {
+                districtMap[d.district] = (districtMap[d.district] || 0) + 1;
+            });
+            const ctx4 = document.getElementById('districtChart').getContext('2d');
+            chartInstances.districtChart = new Chart(ctx4, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(districtMap),
+                    datasets: [{
+                        label: '개설 대학 수',
+                        data: Object.values(districtMap),
+                        backgroundColor: '#f43f5e',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1, color: textColor }, grid: { color: gridColor } },
+                        x: { grid: { display: false }, ticks: { color: textColor } }
+                    }
+                }
+            });
+        }
+
+        // On Load Initialization
+        window.onload = function() {
+            // Check theme preference
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+            
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            updateThemeUI(isDark);
+
+            renderTable(rawData);
+            initCharts(isDark);
+        };
+    </script>
+</body>
+</html>

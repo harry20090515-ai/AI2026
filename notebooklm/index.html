@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>올바른 생성형 AI 활용 가이드라인 | 4단계 등급 & 5대 원칙</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Pretendard', sans-serif; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+        }
+        .dark .glass-card {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-300 min-h-screen flex flex-col">
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+            <div class="flex items-center space-x-2.5 cursor-pointer" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md">
+                    <i class="fa-solid fa-robot text-sm"></i>
+                </div>
+                <div>
+                    <span class="font-bold text-sm tracking-tight text-slate-900 dark:text-white block leading-tight">AI Edu Guide</span>
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">올바른 AI 활용 4단계 & 5원칙</span>
+                </div>
+            </div>
+
+            <nav class="hidden md:flex space-x-5 text-xs font-semibold text-slate-600 dark:text-slate-300">
+                <a href="#overview" class="hover:text-blue-600 dark:hover:text-blue-400 transition">기초 쟁점</a>
+                <a href="#levels" class="hover:text-blue-600 dark:hover:text-blue-400 transition">4단계 등급제</a>
+                <a href="#principles" class="hover:text-blue-600 dark:hover:text-blue-400 transition">5대 약속</a>
+                <a href="#process" class="hover:text-blue-600 dark:hover:text-blue-400 transition">수행 프로세스</a>
+                <a href="#diagnosis" class="hover:text-blue-600 dark:hover:text-blue-400 transition">자가진단</a>
+            </nav>
+
+            <div class="flex items-center space-x-2">
+                <!-- Home Button -->
+                <a href="../index.html" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition text-xs flex items-center gap-1.5 font-medium" title="메인 홈으로 이동">
+                    <i class="fa-solid fa-house"></i>
+                    <span class="hidden sm:inline">홈으로</span>
+                </a>
+                
+                <!-- Theme Toggle Button -->
+                <button id="theme-toggle" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition" title="테마 전환">
+                    <i id="theme-toggle-dark-icon" class="fa-solid fa-moon text-sm hidden"></i>
+                    <i id="theme-toggle-light-icon" class="fa-solid fa-sun text-sm hidden"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <main class="flex-grow">
+        <section class="relative overflow-hidden pt-8 pb-12 lg:pt-12 lg:pb-16 bg-gradient-to-b from-blue-50/50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 border-b border-slate-200/60 dark:border-slate-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center max-w-3xl">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 mb-3 border border-blue-200 dark:border-blue-800">
+                    <i class="fa-solid fa-graduation-cap"></i> 학급 내 AI 활용 실천 가이드라인
+                </span>
+                
+                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight mb-3">
+                    올바른 생성형 AI 활용을 위한<br>
+                    <span class="gradient-text">4단계 등급 및 5대 원칙</span>
+                </h1>
+                
+                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
+                    인공지능은 학습을 돕는 유용한 <strong>'부조종사(Co-pilot)'</strong>입니다.<br class="hidden sm:block">
+                    학문적 정직성을 지키며 주체적인 성장을 이루기 위한 구체적인 기준과 규범을 확인해보세요.
+                </p>
+
+                <!-- Action Button Cluster -->
+                <div class="flex flex-col items-center gap-3">
+                    <!-- Row 1 Main Nav buttons -->
+                    <div class="flex flex-wrap gap-2.5 justify-center">
+                        <a href="#levels" class="px-4 py-2 text-xs font-bold rounded-lg text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition flex items-center gap-2">
+                            <i class="fa-solid fa-layer-group"></i> 4단계 등급 알아보기
+                        </a>
+                        <a href="#principles" class="px-4 py-2 text-xs font-bold rounded-lg text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm transition flex items-center gap-2">
+                            <i class="fa-solid fa-shield-halved text-blue-600 dark:text-blue-400"></i> 우리의 5가지 약속
+                        </a>
+                    </div>
+
+                    <!-- Row 2 Media & Download Modal Triggers -->
+                    <div class="flex flex-wrap gap-2 justify-center pt-1">
+                        <a href="ppt.pdf" download="ppt.pdf" class="px-3 py-1.5 text-xs font-medium rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-slate-700 dark:hover:text-blue-400 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-arrow-down text-blue-500"></i> 발표자료 다운로드
+                        </a>
+                        <button onclick="openModal('infographicModal')" class="px-3 py-1.5 text-xs font-medium rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-slate-700 dark:hover:text-indigo-400 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-info text-indigo-500"></i> 인포그래픽 보기
+                        </button>
+                        <button onclick="openModal('videoModal')" class="px-3 py-1.5 text-xs font-medium rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-slate-700 dark:hover:text-rose-400 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-play text-rose-500"></i> 동영상 보기
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 1: Light & Shadow + 6 Key Issues -->
+        <section id="overview" class="py-12 bg-white dark:bg-slate-900 transition-colors">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-2xl mx-auto mb-10">
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2">
+                        강력한 학습 도구와 윤리적 위험성의 공존
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                        생성형 AI는 방대한 기회를 제공하지만, 올바른 제어 없이 사용할 경우 치명적인 위험요소를 내포합니다.
+                    </p>
+                </div>
+
+                <!-- Light vs Shadow Comparison Grid -->
+                <div class="grid md:grid-cols-2 gap-6 mb-12">
+                    <!-- Light (Opportunities) -->
+                    <div class="p-6 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/20 border border-emerald-200 dark:border-emerald-800/50 relative overflow-hidden">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-lg font-bold shadow">
+                                <i class="fa-solid fa-sun"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-bold text-emerald-900 dark:text-emerald-300">빛 (Opportunities)</h3>
+                                <p class="text-xs text-emerald-700 dark:text-emerald-400">생성형 AI가 제공하는 긍정적 학습 효과</p>
+                            </div>
+                        </div>
+                        <ul class="space-y-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
+                            <li class="flex items-start gap-2.5">
+                                <i class="fa-solid fa-circle-check text-emerald-500 mt-1"></i>
+                                <span><strong>즉각적 접근성:</strong> 방대한 학습 자료에 대한 실시간 정보 탐색</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <i class="fa-solid fa-circle-check text-emerald-500 mt-1"></i>
+                                <span><strong>실시간 Q&A:</strong> 궁금증 해결을 위한 맞춤형 튜터링 및 피드백</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <i class="fa-solid fa-circle-check text-emerald-500 mt-1"></i>
+                                <span><strong>자기주도 성장:</strong> 개별 학습 속도에 맞는 수준별 가이드라인</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Shadow (Risks) -->
+                    <div class="p-6 rounded-2xl bg-gradient-to-br from-rose-50 to-amber-50 dark:from-rose-950/30 dark:to-amber-950/20 border border-rose-200 dark:border-rose-800/50 relative overflow-hidden">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-xl bg-rose-500 text-white flex items-center justify-center text-lg font-bold shadow">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-bold text-rose-900 dark:text-rose-300">그림자 (Risks)</h3>
+                                <p class="text-xs text-rose-700 dark:text-rose-400">주의가 필요한 기술적·윤리적 한계</p>
+                            </div>
+                        </div>
+                        <ul class="space-y-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
+                            <li class="flex items-start gap-2.5">
+                                <i class="fa-solid fa-circle-xmark text-rose-500 mt-1"></i>
+                                <span><strong>환각 현상 (Hallucination):</strong> 그럴듯한 거짓 정보를 사실처럼 생성</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <i class="fa-solid fa-circle-xmark text-rose-500 mt-1"></i>
+                                <span><strong>표절 및 부작용:</strong> 검증되지 않은 산출물 제출에 따른 부정행위</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <i class="fa-solid fa-circle-xmark text-rose-500 mt-1"></i>
+                                <span><strong>개인정보 유출:</strong> 민감한 개인 식별 데이터 입력 시 보안 위협</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 6 Key Issues Interactive Grid -->
+                <div class="mt-8">
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-6 text-center">
+                        <i class="fa-solid fa-list-check text-blue-600 mr-2"></i>생성형 AI 활용 시 주의해야 할 6대 핵심 쟁점
+                    </h3>
+                    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Issue 1 -->
+                        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-400 transition">
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 font-bold text-xs flex items-center justify-center">1</span>
+                                <h4 class="font-bold text-sm text-slate-900 dark:text-white">팩트체크 (Fact Check)</h4>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-400">AI의 환각 현상을 방지하기 위해 생성된 모든 내용에 대한 철저한 사실 검증 필수</p>
+                        </div>
+                        <!-- Issue 2 -->
+                        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-400 transition">
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 font-bold text-xs flex items-center justify-center">2</span>
+                                <h4 class="font-bold text-sm text-slate-900 dark:text-white">책임주의 (Responsibility)</h4>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-400">AI 도구가 제공한 결과물이더라도 최종 과제물에 대한 모든 법적·학술적 책임은 제출자 귀속</p>
+                        </div>
+                        <!-- Issue 3 -->
+                        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-400 transition">
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 font-bold text-xs flex items-center justify-center">3</span>
+                                <h4 class="font-bold text-sm text-slate-900 dark:text-white">편향주의 (Bias Caution)</h4>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-400">인종, 성별, 종교, 문화에 대한 사회적 편견 및 차별적 언어 표현 포함 여부 점검</p>
+                        </div>
+                        <!-- Issue 4 -->
+                        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-400 transition">
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 font-bold text-xs flex items-center justify-center">4</span>
+                                <h4 class="font-bold text-sm text-slate-900 dark:text-white">출처표기 (Attribution)</h4>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-400">활용한 AI 서비스 명칭, 사용 프롬프트, 도구 버전 등의 이력을 반드시 과제에 밝힘</p>
+                        </div>
+                        <!-- Issue 5 -->
+                        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-400 transition">
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 font-bold text-xs flex items-center justify-center">5</span>
+                                <h4 class="font-bold text-sm text-slate-900 dark:text-white">개인정보 (Privacy)</h4>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-400">이름, 학번, 전화번호, 비공개 학교 및 가족 정보 등 개인식별 데이터 프롬프트 입력 금지</p>
+                        </div>
+                        <!-- Issue 6 -->
+                        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-400 transition">
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 font-bold text-xs flex items-center justify-center">6</span>
+                                <h4 class="font-bold text-sm text-slate-900 dark:text-white">표절금지 (No Plagiarism)</h4>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-400">AI가 생성한 문장을 그대로 복사하여 본인의 글인 것처럼 제출하는 대작 행위 강력 차단</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: 4-Level AI Usage Grade System -->
+        <section id="levels" class="py-12 bg-slate-100/70 dark:bg-slate-950 border-y border-slate-200 dark:border-slate-800 transition-colors">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-2xl mx-auto mb-10">
+                    <span class="text-xs font-bold text-blue-600 dark:text-blue-400 tracking-wider uppercase mb-1 block">Task-Based Classification</span>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2">
+                        과제 성격에 따른 AI 사용 4단계 등급제
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+                        무조건적인 금지가 아닌, 평가의 목적과 창의적 협업 비율에 기반한 4개 등급 가이드라인
+                    </p>
+                </div>
+
+                <!-- Level Tabs Navigation -->
+                <div class="flex flex-wrap justify-center gap-2 mb-8" id="level-tabs">
+                    <button onclick="selectLevel('red')" id="tab-red" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-red-600 text-white shadow">
+                        <span class="w-2.5 h-2.5 rounded-full bg-white"></span> Red (전면 금지)
+                    </button>
+                    <button onclick="selectLevel('yellow')" id="tab-yellow" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Yellow (아이디어 탐색)
+                    </button>
+                    <button onclick="selectLevel('green')" id="tab-green" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Green (보조 및 교정)
+                    </button>
+                    <button onclick="selectLevel('blue')" id="tab-blue" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                        <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Blue (전면 허용)
+                    </button>
+                </div>
+
+                <!-- Level Detail Card Panel -->
+                <div id="level-display" class="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-lg mb-10">
+                    <!-- Dynamic Javascript Content Populated Here -->
+                </div>
+
+                <!-- Comprehensive Summary Table -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div class="p-4 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                        <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+                            <i class="fa-solid fa-table-list text-blue-600"></i> 한눈에 확인하는 4단계 등급별 허용 범위
+                        </h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                            <thead>
+                                <tr class="bg-slate-100/80 dark:bg-slate-800/40 text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
+                                    <th class="p-3.5 font-bold w-28">등급</th>
+                                    <th class="p-3.5 font-bold w-40">허용 범위</th>
+                                    <th class="p-3.5 font-bold">구체적 활동 예시</th>
+                                    <th class="p-3.5 font-bold">적용 과제 유형</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+                                <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
+                                    <td class="p-3.5 font-bold text-red-600 dark:text-red-400"><span class="px-2 py-0.5 rounded bg-red-100 dark:bg-red-950">Red</span></td>
+                                    <td class="p-3.5 font-semibold">전면 금지 (대작 불가)</td>
+                                    <td class="p-3.5">실시간 퀴즈 및 단순 암기 시험 풀이 대행 금지</td>
+                                    <td class="p-3.5">정기 고사 및 교실 내 자필 작성 과제</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
+                                    <td class="p-3.5 font-bold text-amber-600 dark:text-amber-400"><span class="px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-950">Yellow</span></td>
+                                    <td class="p-3.5 font-semibold">제한적 (아이디어)</td>
+                                    <td class="p-3.5">주제 탐색, 브레인스토밍, 발표 개요/목차 구성</td>
+                                    <td class="p-3.5">에세이 초기 기획안, 발표 주제 선정 과제</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
+                                    <td class="p-3.5 font-bold text-emerald-600 dark:text-emerald-400"><span class="px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950">Green</span></td>
+                                    <td class="p-3.5 font-semibold">보조적 (교정/요약)</td>
+                                    <td class="p-3.5">문법/맞춤법 오류 검수, 요약, 코드 디버깅</td>
+                                    <td class="p-3.5">최종 보고서 윤문 및 프로그래밍 실습 과제</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
+                                    <td class="p-3.5 font-bold text-blue-600 dark:text-blue-400"><span class="px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-950">Blue</span></td>
+                                    <td class="p-3.5 font-semibold">전면 허용 (도구 주도)</td>
+                                    <td class="p-3.5">AI 모델간 비교, 프롬프트 엔지니어링, 최적화</td>
+                                    <td class="p-3.5">AI 기반 문제해결 프로젝트, 미래 기술 과제</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: 5 Key Promises -->
+        <section id="principles" class="py-12 bg-white dark:bg-slate-900 transition-colors">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-2xl mx-auto mb-10">
+                    <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 tracking-wider uppercase mb-1 block">Our Core Principles</span>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2">
+                        AI를 부조종사로 활용하기 위한 우리의 5가지 약속
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+                        기술의 혜택을 온전히 누리며 학문적 진실성을 지켜내기 위한 실천 원칙
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Principle 1 -->
+                    <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="px-2.5 py-1 rounded-lg text-xs font-extrabold bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">원칙 1</span>
+                                <div class="flex gap-1 text-[10px] font-bold">
+                                    <span class="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300">Yellow</span>
+                                    <span class="px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">Green</span>
+                                    <span class="px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300">Blue</span>
+                                </div>
+                            </div>
+                            <h3 class="text-base font-bold text-slate-900 dark:text-white mb-2">투명한 공개</h3>
+                            <ul class="text-xs text-slate-600 dark:text-slate-300 space-y-2 list-disc list-inside">
+                                <li>과제물 하단에 사용한 AI 도구 명칭 및 사용 프롬프트 반드시 명시</li>
+                                <li>국제 표준 인용 규격 및 학술적 출처 표기 방식 준수</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Principle 2 -->
+                    <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="px-2.5 py-1 rounded-lg text-xs font-extrabold bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">원칙 2</span>
+                                <div class="flex gap-1 text-[10px] font-bold">
+                                    <span class="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300">Yellow</span>
+                                    <span class="px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">Green</span>
+                                    <span class="px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300">Blue</span>
+                                </div>
+                            </div>
+                            <h3 class="text-base font-bold text-slate-900 dark:text-white mb-2">비판적 검증</h3>
+                            <ul class="text-xs text-slate-600 dark:text-slate-300 space-y-2 list-disc list-inside">
+                                <li>존재하지 않는 논문이나 가짜 사실을 만드는 환각 현상 주의</li>
+                                <li>AI 답변을 맹신하지 않고 공식 교과서 및 문헌과 직접 대조</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Principle 3 -->
+                    <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="px-2.5 py-1 rounded-lg text-xs font-extrabold bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">원칙 3</span>
+                                <div class="flex gap-1 text-[10px] font-bold">
+                                    <span class="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300">Yellow</span>
+                                    <span class="px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">Green</span>
+                                </div>
+                            </div>
+                            <h3 class="text-base font-bold text-slate-900 dark:text-white mb-2">주체적 구성</h3>
+                            <ul class="text-xs text-slate-600 dark:text-slate-300 space-y-2 list-disc list-inside">
+                                <li>AI 초안을 그대로 복사하여 제출하는 행위 전면 금지</li>
+                                <li>AI 산출물은 참고용이며, 본인만의 논리와 언어로 재작성 필수</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Principle 4 -->
+                    <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="px-2.5 py-1 rounded-lg text-xs font-extrabold bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">원칙 4</span>
+                                <div class="flex gap-1 text-[10px] font-bold">
+                                    <span class="px-1.5 py-0.5 rounded bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300">전 등급 공통</span>
+                                </div>
+                            </div>
+                            <h3 class="text-base font-bold text-slate-900 dark:text-white mb-2">정보 보안</h3>
+                            <ul class="text-xs text-slate-600 dark:text-slate-300 space-y-2 list-disc list-inside">
+                                <li>이름, 학번, 주민번호 등 민감 개인정보 프롬프트 입력 엄금</li>
+                                <li>학급 내부 미공개 자료 및 타 사생활 보호</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Principle 5 -->
+                    <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col justify-between md:col-span-2 lg:col-span-2">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="px-2.5 py-1 rounded-lg text-xs font-extrabold bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">원칙 5</span>
+                                <div class="flex gap-1 text-[10px] font-bold">
+                                    <span class="px-1.5 py-0.5 rounded bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300">전 등급 공통</span>
+                                </div>
+                            </div>
+                            <h3 class="text-base font-bold text-slate-900 dark:text-white mb-2">윤리적 필터</h3>
+                            <ul class="text-xs text-slate-600 dark:text-slate-300 space-y-2 list-disc list-inside">
+                                <li>성별, 인종, 종교, 지역 차별 및 혐오적인 결과물 완전 거부</li>
+                                <li>부적절한 산출물 발견 시 즉시 폐기 및 해당 AI 서비스 오류 신고 수행</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Process Workflow -->
+        <section id="process" class="py-12 bg-slate-100/70 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 transition-colors">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-2xl mx-auto mb-10">
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2">
+                        과제 부여부터 제출까지 이어지는 4단계 통합 프로세스
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+                        체계적이고 안전한 AI 활용을 위한 스텝 바이 스텝 가이드
+                    </p>
+                </div>
+
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Step 1 -->
+                    <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 relative shadow-sm">
+                        <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center mb-3">01</div>
+                        <h3 class="font-bold text-sm text-slate-900 dark:text-white mb-1">Step 1. 과제 확인</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">선생님이 부여한 과제의 평가 목적 및 안내된 4단계 등급 확인</p>
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">등급 라벨 체크</span>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 relative shadow-sm">
+                        <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center mb-3">02</div>
+                        <h3 class="font-bold text-sm text-slate-900 dark:text-white mb-1">Step 2. 활용 결정</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">4단계 등급 범위 안에서 사용 범위와 도구 적합성 판단</p>
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">허용 구획 설정</span>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 relative shadow-sm">
+                        <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center mb-3">03</div>
+                        <h3 class="font-bold text-sm text-slate-900 dark:text-white mb-1">Step 3. 원칙 적용</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">작성 과정에서 5대 약속(검증, 재구성, 보안 등) 철저 수행</p>
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">5대 원칙 실천</span>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 relative shadow-sm">
+                        <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center mb-3">04</div>
+                        <h3 class="font-bold text-sm text-slate-900 dark:text-white mb-1">Step 4. 최종 제출</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">인간의 주체적 재해석 문장에 사용 AI 프롬프트 명시 후 제출</p>
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">출처 표기 완료</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Interactive Self-Diagnosis Widget -->
+        <section id="diagnosis" class="py-12 bg-white dark:bg-slate-900 transition-colors">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl">
+                    <div class="text-center max-w-xl mx-auto mb-6">
+                        <span class="px-3 py-1 rounded-full bg-white/20 text-white text-xs font-bold inline-block mb-2 backdrop-blur-sm">Interactive Diagnostic Calculator</span>
+                        <h2 class="text-xl sm:text-2xl font-bold">과제 AI 활용 등급 판정기 & 윤리 점검</h2>
+                        <p class="text-xs text-blue-100 mt-1">내가 수행하려는 방식이 가이드라인을 잘 준수하고 있는지 미리 확인하세요.</p>
+                    </div>
+
+                    <form id="diagnosis-form" onsubmit="evaluateDiagnosis(event)" class="bg-white/10 backdrop-blur-md p-5 rounded-2xl text-xs space-y-4 border border-white/20">
+                        <div>
+                            <label class="block font-bold mb-1.5 text-slate-100">1. 수행하려는 과제 종류를 선택하세요</label>
+                            <select id="diag-task" class="w-full p-2.5 rounded-lg bg-slate-900/80 text-white border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                                <option value="exam">정기 고사 / 서술형 자필 시험</option>
+                                <option value="essay_plan">에세이 초기 주제 및 발표 목차 구상</option>
+                                <option value="report_proof">보고서 맞춤법 교정 / 문장 다듬기 / 요약</option>
+                                <option value="ai_proj">AI 모델 비교 분석 / 프롬프트 실습 과제</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold mb-1.5 text-slate-100">2. AI를 어떻게 활용할 예정인가요?</label>
+                            <select id="diag-usage" class="w-full p-2.5 rounded-lg bg-slate-900/80 text-white border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                                <option value="solve">AI에게 정답/문장 전체를 작성하게 하고 그대로 제출</option>
+                                <option value="brainstorm">아이디어 수집 및 브레인스토밍 참고용으로만 활용</option>
+                                <option value="grammar">내가 쓴 초안의 오탈자 교정 및 요약용으로 활용</option>
+                                <option value="prompt_dev">프롬프트를 다각도로 설계하여 결과 성능을 직접 실험</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-2 pt-2 border-t border-white/10">
+                            <label class="block font-bold text-slate-100">3. 윤리 준수 항목 체크</label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="chk-privacy" class="rounded text-blue-600 focus:ring-0">
+                                <span>이름, 학번 등 개인 식별 정보를 프롬프트에 넣지 않습니다.</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="chk-fact" class="rounded text-blue-600 focus:ring-0">
+                                <span>AI가 생성한 내용은 교과서나 공식 출처로 교차 검증합니다.</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="chk-attr" class="rounded text-blue-600 focus:ring-0">
+                                <span>과제 하단에 사용한 AI 명칭과 프롬프트를 명시하겠습니다.</span>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="w-full py-3 rounded-xl bg-white text-blue-700 font-extrabold text-sm shadow hover:bg-blue-50 transition">
+                            진단 결과 확인하기
+                        </button>
+                    </form>
+
+                    <!-- Evaluation Result Box -->
+                    <div id="diag-result" class="hidden mt-4 p-4 rounded-xl bg-slate-950/80 border border-white/20 text-xs">
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-8 border-t border-slate-800 text-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-3">
+            <div class="flex justify-center items-center gap-2 text-white font-bold">
+                <i class="fa-solid fa-robot text-blue-500"></i> AI Edu Guidebook
+            </div>
+            <p class="max-w-xl mx-auto text-slate-400">
+                "인공지능은 도구일 뿐 학습의 주체는 우리 자신입니다.<br>
+                올바른 디지털 윤리 의식으로 학문적 진실성을 지켜나갑시다."
+            </p>
+            <p class="text-slate-600">© 2026 Academic AI Ethics Guidelines. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Modals Container -->
+    
+    <!-- Download Modal -->
+    <div id="downloadModal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-6 relative shadow-2xl">
+            <button onclick="closeModal('downloadModal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-300 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-file-arrow-down"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-base text-slate-900 dark:text-white">발표자료 다운로드</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">학급 안내용 발표 자료 파일</p>
+                </div>
+            </div>
+            <div class="space-y-3 my-5">
+                <a href="ppt.pdf" download="ppt.pdf" class="p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-blue-500 flex items-center justify-between group transition bg-slate-50 dark:bg-slate-800/50">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-regular fa-file-pdf text-rose-500 text-xl"></i>
+                        <div>
+                            <div class="font-bold text-xs text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">ppt.pdf 다운로드</div>
+                            <div class="text-[10px] text-slate-500">생성형 AI 활용 가이드라인 발표자료</div>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-download text-xs text-slate-400 group-hover:text-blue-500"></i>
+                </a>
+            </div>
+            <button onclick="closeModal('downloadModal')" class="w-full py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                닫기
+            </button>
+        </div>
+    </div>
+
+    <!-- Infographic Modal -->
+    <div id="infographicModal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-3xl w-full p-6 relative shadow-2xl max-h-[90vh] flex flex-col">
+            <button onclick="closeModal('infographicModal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 z-10">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-circle-info"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-base text-slate-900 dark:text-white">가이드라인 인포그래픽</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">image.png 한눈에 보는 인포그래픽</p>
+                </div>
+            </div>
+            
+            <div class="overflow-y-auto space-y-4 pr-1 flex-grow my-2 flex items-center justify-center">
+                <img src="image.png" alt="가이드라인 인포그래픽" class="w-full h-auto max-h-[65vh] object-contain rounded-xl shadow-sm border border-slate-200 dark:border-slate-800" onerror="this.onerror=null; this.src='https://placehold.co/800x1200/2563eb/ffffff?text=image.png+이미지를+찾을+수+없습니다';">
+            </div>
+
+            <button onclick="closeModal('infographicModal')" class="w-full mt-2 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                닫기
+            </button>
+        </div>
+    </div>
+
+    <!-- Video Modal -->
+    <div id="videoModal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-3xl w-full p-6 relative shadow-2xl">
+            <button onclick="closeModal('videoModal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 z-10">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-300 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-circle-play"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-base text-slate-900 dark:text-white">시청 가이드 동영상</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">생성형 AI 올바른 활용 영상 (ai video.mp4)</p>
+                </div>
+            </div>
+
+            <div class="aspect-video bg-slate-950 rounded-xl overflow-hidden mb-4 relative flex items-center justify-center border border-slate-800">
+                <video controls class="w-full h-full object-contain">
+                    <source src="ai video.mp4" type="video/mp4">
+                    브라우저가 비디오 재생을 지원하지 않거나 ai video.mp4 파일을 찾을 수 없습니다.
+                </video>
+            </div>
+
+            <button onclick="closeModal('videoModal')" class="w-full py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                닫기
+            </button>
+        </div>
+    </div>
+
+    <!-- Application Logic & Scripts -->
+    <script>
+        // 1. Level Data Definition
+        const levelData = {
+            red: {
+                title: "Red (전면 금지 - AI 대작 절대 불가)",
+                colorClass: "text-red-600 dark:text-red-400",
+                badgeBg: "bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300",
+                principle: "기계적 대작 불가 및 순수 인간 고유 사고력 평가 입증 요구",
+                activities: [
+                    "실시간 퀴즈 풀이 및 단순 암기 시험 대행 금지",
+                    "교실 내 감독 하에 실시되는 서술형 시험 AI 사용 금지",
+                    "AI가 생성한 전체 문장을 그대로 복사 붙여넣기하는 행위 차단"
+                ],
+                appliedTasks: "학기 말 정기 고사, 실시간 자필 평가 과제, 암기 기반 지식 측정 평가"
+            },
+            yellow: {
+                title: "Yellow (아이디어 탐색 - 제한적 허용)",
+                colorClass: "text-amber-600 dark:text-amber-400",
+                badgeBg: "bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300",
+                principle: "창작의 뼈대를 세우기 위한 영감 도출 및 초기 브레인스토밍 목적에 한정",
+                activities: [
+                    "광범위한 주제 탐색 및 브레인스토밍 아이디어 발상",
+                    "발표 자료 작성을 위한 대략적인 목차 및 개요 구상",
+                    "연구 질문 설정을 위한 보조 탐색"
+                ],
+                appliedTasks: "에세이 초기 기획안 제출, 발표 주제 선정, 프로젝트 탐구 아이디어 구상"
+            },
+            green: {
+                title: "Green (보조 및 교정 - 초안 작성 후 검수)",
+                colorClass: "text-emerald-600 dark:text-emerald-400",
+                badgeBg: "bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300",
+                principle: "학생 본인이 수작업으로 초안 작성 완료 후, 결과물의 다듬기 및 구조화에 AI 활용",
+                activities: [
+                    "맞춤법, 띄어쓰기, 문법 오류 검수 및 문장 윤문",
+                    "방대한 참고 자료의 핵심 요약 및 문단 구조 정돈",
+                    "프로그래밍 실습 코드 디버깅 및 단순 오류 교정"
+                ],
+                appliedTasks: "최종 보고서 제출 전 완성도 제고, 코딩 실습 과제 버그 수정"
+            },
+            blue: {
+                title: "Blue (전면 허용 - AI 도구 주도 탐구)",
+                colorClass: "text-blue-600 dark:text-blue-400",
+                badgeBg: "bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300",
+                principle: "도구의 한계를 시험하고 최적의 결과를 얻어내기 위한 프롬프트 공학 및 성능 분석 탐구",
+                activities: [
+                    "다양한 AI 모델(ChatGPT, Claude, Gemini 등) 간 답변 품질 및 성향 비교 분석",
+                    "원하는 최적 결과물을 이끌어내기 위한 프롬프트 엔지니어링 실습",
+                    "인공지능 기반 문제 해결 특화 융합 프로젝트"
+                ],
+                appliedTasks: "AI 특화 융합 탐구 과제, 인공지능 윤리 비교 분석 리포트"
+            }
+        };
+
+        // 2. Select Level Tab Display
+        function selectLevel(levelKey) {
+            const data = levelData[levelKey];
+            const displayEl = document.getElementById('level-display');
+            
+            // Highlight Tab Buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700";
+            });
+            
+            const activeBtn = document.getElementById(`tab-${levelKey}`);
+            if (activeBtn) {
+                if (levelKey === 'red') activeBtn.className = "tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-red-600 text-white shadow";
+                if (levelKey === 'yellow') activeBtn.className = "tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-amber-500 text-white shadow";
+                if (levelKey === 'green') activeBtn.className = "tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-emerald-600 text-white shadow";
+                if (levelKey === 'blue') activeBtn.className = "tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-blue-600 text-white shadow";
+            }
+
+            // Render Card Body
+            displayEl.innerHTML = `
+                <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                    <h3 class="text-lg font-bold ${data.colorClass}">${data.title}</h3>
+                    <span class="px-3 py-1 rounded-full text-xs font-bold ${data.badgeBg}">핵심 적용 지침</span>
+                </div>
+                <div class="space-y-4 text-xs sm:text-sm">
+                    <div>
+                        <h4 class="font-bold text-slate-900 dark:text-white mb-1"><i class="fa-solid fa-bullseye mr-1.5 text-blue-500"></i>핵심 원칙</h4>
+                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-200/60 dark:border-slate-800">${data.principle}</p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-900 dark:text-white mb-2"><i class="fa-solid fa-list-check mr-1.5 text-blue-500"></i>허용 및 추천 활동</h4>
+                        <ul class="space-y-1.5 text-slate-600 dark:text-slate-300 pl-1">
+                            ${data.activities.map(act => `<li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-500 mt-1 text-xs"></i><span>${act}</span></li>`).join('')}
+                        </ul>
+                    </div>
+                    <div class="pt-2 border-t border-slate-200 dark:border-slate-800">
+                        <span class="font-bold text-slate-900 dark:text-white">적용 대표 과제: </span>
+                        <span class="text-slate-600 dark:text-slate-400">${data.appliedTasks}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 3. Theme Toggle Functionality
+        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            themeToggleLightIcon.classList.remove('hidden');
+        } else {
+            document.documentElement.classList.remove('dark');
+            themeToggleDarkIcon.classList.remove('hidden');
+        }
+
+        document.getElementById('theme-toggle').addEventListener('click', function() {
+            themeToggleDarkIcon.classList.toggle('hidden');
+            themeToggleLightIcon.classList.toggle('hidden');
+
+            if (localStorage.getItem('color-theme')) {
+                if (localStorage.getItem('color-theme') === 'light') {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                }
+            } else {
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                }
+            }
+        });
+
+        // 4. Modal Triggers
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            if(modal) modal.classList.remove('hidden');
+        }
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if(modal) modal.classList.add('hidden');
+        }
+
+        function mockDownload(filename) {
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent("올바른 AI 활용 가이드라인 - " + filename));
+            element.setAttribute('download', filename);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+
+        // 5. Interactive Diagnosis Logic
+        function evaluateDiagnosis(e) {
+            e.preventDefault();
+            const task = document.getElementById('diag-task').value;
+            const usage = document.getElementById('diag-usage').value;
+            const chkPrivacy = document.getElementById('chk-privacy').checked;
+            const chkFact = document.getElementById('chk-fact').checked;
+            const chkAttr = document.getElementById('chk-attr').checked;
+
+            const resultBox = document.getElementById('diag-result');
+            resultBox.classList.remove('hidden');
+
+            let isViolating = false;
+            let statusText = "";
+            let recommendation = "";
+
+            if (task === 'exam' && usage !== 'none') {
+                isViolating = true;
+                statusText = "🚨 경고: Red 등급 위반 가능성 존재";
+                recommendation = "정기 고사나 자필 시험은 순수한 인간 사고력을 검증하는 평가입니다. AI 사용이 전면 금지됩니다.";
+            } else if (usage === 'solve') {
+                isViolating = true;
+                statusText = "⚠️ 주의: 표절 및 주체적 구성 원칙(원칙 3) 위반";
+                recommendation = "AI가 작성한 답안을 그대로 제출하는 대작 행위는 학술적 부정행위에 해당합니다. 반드시 본인의 언어로 재작성하세요.";
+            } else if (!chkPrivacy) {
+                isViolating = true;
+                statusText = "🔒 경고: 개인정보 보호 원칙(원칙 4) 미준수";
+                recommendation = "프롬프트에 이름, 학번 등 개인 식별 정보를 입력해서는 안 됩니다.";
+            } else {
+                statusText = "✅ 통과: 올바른 AI 활용 가이드라인 준수 중";
+                recommendation = `선택하신 과제 유형에 맞추어 적절히 활용하고 계십니다.<br>
+                - 출처 명시 표기(${chkAttr ? '체크 완료' : '필요'})<br>
+                - 팩트체크 교차 검증(${chkFact ? '체크 완료' : '필요'})을 최종 단계까지 잊지 마세요!`;
+            }
+
+            resultBox.innerHTML = `
+                <div class="font-extrabold ${isViolating ? 'text-rose-400' : 'text-emerald-400'} text-sm mb-1">${statusText}</div>
+                <div class="text-slate-200 leading-relaxed">${recommendation}</div>
+            `;
+        }
+
+        // Initialize Level tab on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            selectLevel('red');
+        });
+    </script>
+</body>
+</html>
