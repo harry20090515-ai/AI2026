@@ -6,8 +6,9 @@
 #### [AI 스토리와 영상](https://harry20090515-ai.github.io/AI2026/storybook/index.html)
 + 상식이의 성장
 ---
-##### notebooklm
-+ 올바른 인공지능 활용을 위한 활용 수칙
+##### [진로데이터 분석](https://harry20090515-ai.github.io/AI2026/data2/index.html)
++ 부산,경남 지역 대학 분석
 ---
-###### storybook
-+ 
+###### [나의 진로 리포트](https://harry20090515-ai.github.io/AI2026/data1/index.html)
++ 부산 지역 컴퓨터공학 관련 대학
+기초 통계 및 현황 분석 보고서
