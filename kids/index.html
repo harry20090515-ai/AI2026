@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부산진구 어린이보호구역 및 유동인구 입체 분석 지도 서비스 - 설명서</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --bg-card: rgba(18, 26, 43, 0.75);
+            --bg-card-hover: rgba(28, 40, 65, 0.85);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(59, 130, 246, 0.3);
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.4);
+            --accent-red: #ef4444;
+            --accent-orange: #f97316;
+            --accent-purple: #8b5cf6;
+            --accent-green: #10b981;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --text-dim: #6b7280;
+
+            --font-family: < !DOCTYPE html> <html lang="ko" > <head> <meta charset="UTF-8" > <meta name="viewport" content="width=device-width, initial-scale=1.0" > <title>부산진구 어린이보호구역 및 유동인구 입체 분석 지도 서비스 - 설명서</title> <link rel="preconnect" href="https://fonts.googleapis.com" > <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;800&display=swap" rel="stylesheet" > <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" > <style> :root {
+                --bg-dark: #090d16;
+                --bg-card: rgba(18, 26, 43, 0.75);
+                --bg-card-hover: rgba(28, 40, 65, 0.85);
+                --border-color: rgba(255, 255, 255, 0.08);
+                --border-glow: rgba(59, 130, 246, 0.3);
+                --primary: #3b82f6;
+                --primary-glow: rgba(59, 130, 246, 0.4);
+                --accent-red: #ef4444;
+                --accent-orange: #f97316;
+                --accent-purple: #8b5cf6;
+                --accent-green: #10b981;
+                --text-main: #f3f4f6;
+                --text-muted: #9ca3af;
+                --text-dim: #6b7280;
+                --font-family: 'Noto Sans KR', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            }
+
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                background-color: var(--bg-dark);
+                background-image:
+                    radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.12) 0px, transparent 50%),
+                    radial-gradient(at 100% 100%, rgba(239, 68, 68, 0.08) 0px, transparent 50%),
+                    radial-gradient(at 50% 50%, rgba(139, 92, 246, 0.06) 0px, transparent 50%);
+                background-attachment: fixed;
+                color: var(--text-main);
+                font-family: var(--font-family);
+                line-height: 1.6;
+                padding-bottom: 60px;
+            }
+
+            /* Top Header */
+            .header {
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                backdrop-filter: blur(16px);
+                -webkit-backdrop-filter: blur(16px);
+                background: rgba(9, 13, 22, 0.8);
+                border-bottom: 1px solid var(--border-color);
+                padding: 16px 32px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .header-brand {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                text-decoration: none;
+                color: var(--text-main);
+            }
+
+            .header-icon {
+                width: 40px;
+                height: 40px;
+                background: linear-gradient(135deg, var(--primary), var(--accent-purple));
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                color: #fff;
+                box-shadow: 0 4px 14px var(--primary-glow);
+            }
+
+            .header-title {
+                font-size: 1.15rem;
+                font-weight: 700;
+                letter-spacing: -0.02em;
+            }
+
+            .header-right {
+                display: flex;
+                align-items: center;
+                gap: 24px;
+            }
+
+            .header-nav {
+                display: flex;
+                gap: 20px;
+            }
+
+            .header-nav a {
+                color: var(--text-muted);
+                text-decoration: none;
+                font-size: 0.9rem;
+                font-weight: 500;
+                transition: color 0.2s;
+            }
+
+            .header-nav a:hover {
+                color: var(--primary);
+            }
+
+            /* 홈으로 버튼 스타일 */
+            .btn-home {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 8px 16px;
+                background: rgba(255, 255, 255, 0.06);
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                color: var(--text-main);
+                font-size: 0.88rem;
+                font-weight: 600;
+                text-decoration: none;
+                transition: all 0.2s ease;
+            }
+
+            .btn-home:hover {
+                background: rgba(59, 130, 246, 0.2);
+                border-color: var(--primary);
+                color: #ffffff;
+                box-shadow: 0 0 12px var(--primary-glow);
+            }
+
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 40px 24px;
+            }
+
+            /* Hero Section */
+            .hero {
+                text-align: center;
+                padding: 48px 24px;
+                margin-bottom: 40px;
+                position: relative;
+            }
+
+            .hero-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 6px 16px;
+                background: rgba(59, 130, 246, 0.1);
+                border: 1px solid rgba(59, 130, 246, 0.3);
+                border-radius: 50px;
+                color: #60a5fa;
+                font-size: 0.85rem;
+                font-weight: 600;
+                margin-bottom: 20px;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+                font-weight: 800;
+                line-height: 1.25;
+                margin-bottom: 16px;
+                background: linear-gradient(135deg, #ffffff 30%, #93c5fd 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                letter-spacing: -0.03em;
+            }
+
+            .hero-desc {
+                font-size: 1.1rem;
+                color: var(--text-muted);
+                max-width: 800px;
+                margin: 0 auto 32px;
+                font-weight: 400;
+            }
+
+            .hero-stats {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 16px;
+                margin-top: 32px;
+            }
+
+            .stat-card {
+                background: var(--bg-card);
+                backdrop-filter: blur(12px);
+                border: 1px solid var(--border-color);
+                border-radius: 16px;
+                padding: 20px;
+                text-align: center;
+                transition: transform 0.2s, border-color 0.2s;
+            }
+
+            .stat-card:hover {
+                transform: translateY(-3px);
+                border-color: var(--border-glow);
+            }
+
+            .stat-value {
+                font-size: 1.8rem;
+                font-weight: 800;
+                color: var(--primary);
+                margin-bottom: 4px;
+            }
+
+            .stat-label {
+                font-size: 0.85rem;
+                color: var(--text-muted);
+            }
+
+            /* Section Cards */
+            .section {
+                background: var(--bg-card);
+                backdrop-filter: blur(12px);
+                border: 1px solid var(--border-color);
+                border-radius: 20px;
+                padding: 36px;
+                margin-bottom: 32px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            }
+
+            .section-header {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 24px;
+                padding-bottom: 16px;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .section-icon {
+                width: 36px;
+                height: 36px;
+                background: rgba(59, 130, 246, 0.15);
+                border-radius: 10px;
+                color: var(--primary);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 18px;
+            }
+
+            .section-title {
+                font-size: 1.4rem;
+                font-weight: 700;
+                color: #fff;
+                letter-spacing: -0.02em;
+            }
+
+            /* Cards & Grid Layouts */
+            .grid-2 {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+                gap: 24px;
+            }
+
+            .grid-3 {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 20px;
+            }
+
+            .feature-card {
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid var(--border-color);
+                border-radius: 14px;
+                padding: 24px;
+                transition: all 0.2s;
+            }
+
+            .feature-card:hover {
+                background: rgba(255, 255, 255, 0.05);
+                border-color: rgba(255, 255, 255, 0.15);
+            }
+
+            .feature-title {
+                font-size: 1.05rem;
+                font-weight: 600;
+                color: #fff;
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .feature-desc {
+                font-size: 0.9rem;
+                color: var(--text-muted);
+                line-height: 1.6;
+            }
+
+            /* Styled Table */
+            .table-wrapper {
+                width: 100%;
+                overflow-x: auto;
+                border-radius: 12px;
+                border: 1px solid var(--border-color);
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                text-align: left;
+                font-size: 0.9rem;
+            }
+
+            th {
+                background: rgba(30, 41, 59, 0.8);
+                color: #94a3b8;
+                padding: 14px 18px;
+                font-weight: 600;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            td {
+                padding: 16px 18px;
+                border-bottom: 1px solid var(--border-color);
+                color: var(--text-main);
+            }
+
+            tr:last-child td {
+                border-bottom: none;
+            }
+
+            tr:hover td {
+                background: rgba(255, 255, 255, 0.02);
+            }
+
+            .badge {
+                display: inline-block;
+                padding: 4px 10px;
+                border-radius: 6px;
+                font-size: 0.75rem;
+                font-weight: 600;
+            }
+
+            .badge-blue {
+                background: rgba(37, 99, 235, 0.2);
+                color: #60a5fa;
+                border: 1px solid rgba(37, 99, 235, 0.4);
+            }
+
+            .badge-red {
+                background: rgba(239, 68, 68, 0.2);
+                color: #f87171;
+                border: 1px solid rgba(239, 68, 68, 0.4);
+            }
+
+            .badge-purple {
+                background: rgba(139, 92, 246, 0.2);
+                color: #c084fc;
+                border: 1px solid rgba(139, 92, 246, 0.4);
+            }
+
+            /* Mockup Visual UI */
+            .mockup-container {
+                background: #0b1120;
+                border: 1px solid rgba(255, 255, 255, 0.12);
+                border-radius: 16px;
+                overflow: hidden;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+                margin-top: 20px;
+            }
+
+            .mockup-header {
+                background: #1e293b;
+                padding: 12px 20px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .dots {
+                display: flex;
+                gap: 6px;
+            }
+
+            .dot {
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+            }
+
+            .dot-red {
+                background: #ef4444;
+            }
+
+            .dot-yellow {
+                background: #f59e0b;
+            }
+
+            .dot-green {
+                background: #10b981;
+            }
+
+            .mockup-title {
+                font-size: 0.8rem;
+                color: var(--text-muted);
+                font-family: monospace;
+            }
+
+            .mockup-body {
+                display: grid;
+                grid-template-columns: 280px 1fr;
+                min-height: 420px;
+            }
+
+            @media (max-width: 768px) {
+                .mockup-body {
+                    grid-template-columns: 1fr;
+                }
+
+                .header {
+                    flex-direction: column;
+                    gap: 16px;
+                    padding: 16px;
+                }
+
+                .header-right {
+                    width: 100%;
+                    justify-content: space-between;
+                }
+            }
+
+            .mockup-sidebar {
+                background: #0f172a;
+                border-right: 1px solid var(--border-color);
+                padding: 16px;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .mockup-input {
+                background: #1e293b;
+                border: 1px solid var(--border-color);
+                border-radius: 6px;
+                padding: 8px 12px;
+                font-size: 0.8rem;
+                color: var(--text-muted);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .mockup-card {
+                background: rgba(30, 41, 59, 0.5);
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                padding: 12px;
+                font-size: 0.8rem;
+            }
+
+            .mockup-map {
+                background: #090d16;
+                position: relative;
+                background-image:
+                    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+                background-size: 30px 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            }
+
+            .mock-pin {
+                position: absolute;
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                color: white;
+                box-shadow: 0 0 12px currentColor;
+                cursor: pointer;
+            }
+
+            .mock-pin-blue {
+                background: #2563eb;
+                color: #2563eb;
+                top: 35%;
+                left: 40%;
+            }
+
+            .mock-pin-red {
+                background: #ef4444;
+                color: #ef4444;
+                top: 60%;
+                left: 65%;
+            }
+
+            .mock-heat {
+                position: absolute;
+                width: 140px;
+                height: 100px;
+                background: radial-gradient(circle, rgba(239, 68, 68, 0.3) 0%, rgba(249, 115, 22, 0.2) 50%, transparent 70%);
+                top: 45%;
+                left: 55%;
+                border-radius: 40%;
+                border: 1px dashed rgba(239, 68, 68, 0.4);
+            }
+
+            .mock-popup {
+                position: absolute;
+                top: 20%;
+                left: 45%;
+                background: #1e293b;
+                border: 1px solid var(--primary);
+                border-radius: 8px;
+                padding: 12px;
+                width: 220px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+                font-size: 0.75rem;
+                z-index: 10;
+            }
+
+            /* 하단 자세히 보기 CTA 섹션 */
+            .cta-section {
+                text-align: center;
+                padding: 40px 20px 20px;
+                margin-top: 20px;
+            }
+
+            .btn-detail {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 12px;
+                padding: 16px 36px;
+                background: linear-gradient(135deg, var(--primary), var(--accent-purple));
+                border: none;
+                border-radius: 12px;
+                color: #ffffff;
+                font-size: 1.1rem;
+                font-weight: 700;
+                text-decoration: none;
+                box-shadow: 0 6px 20px var(--primary-glow);
+                transition: all 0.3s ease;
+                cursor: pointer;
+            }
+
+            .btn-detail:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 28px rgba(59, 130, 246, 0.6);
+                background: linear-gradient(135deg, #2563eb, #7c3aed);
+            }
+
+            /* Footer */
+            .footer {
+                text-align: center;
+                padding: 32px 0 0;
+                color: var(--text-dim);
+                font-size: 0.85rem;
+                border-top: 1px solid var(--border-color);
+                margin-top: 40px;
+            }
+
+            .footer a {
+                color: var(--text-muted);
+                text-decoration: none;
+            }
+
+            .footer a:hover {
+                color: var(--primary);
+            }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <a href="../index.html" class="header-brand">
+            <div class="header-icon">
+                <i class="fa-solid fa-shield-cat"></i>
+            </div>
+            <div class="header-title">부산진구 어린이보호구역 입체 분석</div>
+        </a>
+        <div class="header-right">
+            <nav class="header-nav">
+                <a href="#overview">개요</a>
+                <a href="#target">활용 대상</a>
+                <a href="#ui">화면 구성</a>
+                <a href="#data">데이터 명세</a>
+                <a href="#insight">정책 효과</a>
+            </nav>
+            <!-- 상단 홈으로 버튼 -->
+            <a href="../index.html" class="btn-home">
+                <i class="fa-solid fa-house"></i> 홈으로
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Hero -->
+        <section class="hero">
+            <div class="hero-badge">
+                <i class="fa-solid fa-file-code"></i> 기획 명세서 & 서비스 설명서 (Service PRD)
+            </div>
+            <h1 class="hero-title">부산진구 어린이보호구역 및<br>유동인구 입체 분석 지도 서비스</h1>
+            <p class="hero-desc">
+                부산광역시 진구 내 74개 어린이보호구역 현황과 60개 격자별 유동인구 분석 데이터를 융합하여,<br>
+                CCTV 미설치 스쿨존 및 유동인구 밀집 안전 사각지대를 입체적으로 시각화하는 인터랙티브 대시보드 기획안입니다.
+            </p>
+
+            <div class="hero-stats">
+                <div class="stat-card">
+                    <div class="stat-value">74개소</div>
+                    <div class="stat-label">부산진구 관내 어린이보호구역</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">60개 구역</div>
+                    <div class="stat-label">유동인구 격자 바운딩 박스</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">2D/3D Layer</div>
+                    <div class="stat-label">CCTV 핀 & 히트맵 오버레이</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">Risk Cross</div>
+                    <div class="stat-label">고위험 사각지대 교차 분석</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1. Overview -->
+        <section id="overview" class="section">
+            <div class="section-header">
+                <div class="section-icon"><i class="fa-solid fa-bullseye"></i></div>
+                <h2 class="section-title">1. 프로젝트 개요 및 배경</h2>
+            </div>
+            <div class="grid-2">
+                <div class="feature-card">
+                    <div class="feature-title">
+                        <i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-red);"></i>
+                        어린이 교통안전 사각지대 발굴
+                    </div>
+                    <div class="feature-desc">
+                        단순 보호구역 지정을 넘어, 실제 통학 시간대 유동인구가 밀집하는 지역 중 CCTV가 미설치된 **고위험 사각지대**를 수치화하여 직관적으로 분석합니다.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">
+                        <i class="fa-solid fa-chart-pie" style="color: var(--primary);"></i>
+                        데이터 기반 정책 의사결정
+                    </div>
+                    <div class="feature-desc">
+                        부산진구청 및 부산진경찰서 등 관계 기관이 CCTV 신규 설치, 보차도 분리 등 안전 시설물 우선 투자 구역을 합리적으로 선정할 수 있도록 데이터 근거를 제공합니다.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Target Users -->
+        <section id="target" class="section">
+            <div class="section-header">
+                <div class="section-icon"><i class="fa-solid fa-users"></i></div>
+                <h2 class="section-title">2. 타겟 사용자 및 활용 시나리오</h2>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>구분</th>
+                            <th>주요 사용자</th>
+                            <th>주요 활용 시나리오</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-blue">지자체 / 경찰서</span></td>
+                            <td>부산진구청 교통행정과, 부산진경찰서</td>
+                            <td>• 유동인구 대비 CCTV 미설치 스쿨존 우선 순위 검토<br>• 어린이보호구역 개선 예산의 효율적 배정 및 시설 실태 파악</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-purple">주민 / 학부모</span></td>
+                            <td>진구 거주 학부모 및 보호자</td>
+                            <td>• 자녀 통학로 주변 CCTV 설치 여부 및 위험도 확인<br>• 스쿨존 내 안전 시설물 개선 건의를 위한 정량적 데이터 확보</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-red">연구자 / 시민단체</span></td>
+                            <td>도시계획·교통안전 연구자</td>
+                            <td>• 유동인구 시공간 패턴과 스쿨존 안전 시설물 간의 상호작용 분석</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 3. UI/UX Composition -->
+        <section id="ui" class="section">
+            <div class="section-header">
+                <div class="section-icon"><i class="fa-solid fa-desktop"></i></div>
+                <h2 class="section-title">3. 대시보드 화면 구성 & UI 레이아웃</h2>
+            </div>
+            <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.95rem;">
+                대시보드는 **Modern Dark Glassmorphic UI** 스타일을 적용하여, 시각적 몰입감과 분석 집중도를 극대화합니다.
+            </p>
+
+            <!-- Mockup Diagram -->
+            <div class="mockup-container">
+                <div class="mockup-header">
+                    <div class="dots">
+                        <div class="dot dot-red"></div>
+                        <div class="dot dot-yellow"></div>
+                        <div class="dot dot-green"></div>
+                    </div>
+                    <div class="mockup-title">https://ai2026.github.io/kids/dashboard - Layout Preview</div>
+                </div>
+                <div class="mockup-body">
+                    <div class="mockup-sidebar">
+                        <div class="mockup-input">
+                            <i class="fa-solid fa-magnifying-glass"></i> 시설명 검색 (예: 초등학교)
+                        </div>
+                        <div class="mockup-card">
+                            <div style="font-weight: 600; color: #fff; margin-bottom: 4px;">🎯 스마트 필터</div>
+                            <div style="color: var(--text-muted); font-size: 0.75rem;">• 시설종류: 전체 / 초등 / 유치원</div>
+                            <div style="color: var(--text-muted); font-size: 0.75rem;">• CCTV여부: 전체 / Y / N</div>
+                        </div>
+                        <div class="mockup-card"
+                            style="border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.1);">
+                            <div style="font-weight: 600; color: #f87171; margin-bottom: 4px;">🚨 안전 사각지대 지표</div>
+                            <div style="color: #fca5a5; font-size: 0.85rem; font-weight: 700;">유동인구 High & CCTV 미설치
+                            </div>
+                        </div>
+                        <div class="mockup-card" style="flex: 1;">
+                            <div style="font-weight: 600; color: #fff; margin-bottom: 6px;">📋 보호구역 시설 목록</div>
+                            <div
+                                style="color: var(--text-muted); font-size: 0.75rem; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                1. 성지초등학교 <span class="badge badge-blue" style="font-size:0.65rem">CCTV Y</span></div>
+                            <div style="color: var(--text-muted); font-size: 0.75rem; padding: 4px 0;">2. 벽산유치원 <span
+                                    class="badge badge-red" style="font-size:0.65rem">CCTV N</span></div>
+                        </div>
+                    </div>
+                    <div class="mockup-map">
+                        <div class="mock-heat"></div>
+                        <div class="mock-pin mock-pin-blue" title="CCTV 설치 (Y)"><i class="fa-solid fa-video"></i></div>
+                        <div class="mock-pin mock-pin-red" title="CCTV 미설치 (N)"><i class="fa-solid fa-video-slash"></i>
+                        </div>
+
+                        <div class="mock-popup">
+                            <div style="font-weight: 700; color: #fff; margin-bottom: 4px;">📍 벽산유치원</div>
+                            <div style="color: var(--text-muted);">• 도로명: 부산진구 초읍천로...</div>
+                            <div style="color: var(--text-muted);">• CCTV: <span
+                                    style="color:#ef4444; font-weight:bold;">미설치 (N)</span></div>
+                            <div style="color: var(--text-muted);">• 인근 유동인구: <span
+                                    style="color:#f97316; font-weight:bold;">14,250명</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Data Architecture -->
+        <section id="data" class="section">
+            <div class="section-header">
+                <div class="section-icon"><i class="fa-solid fa-database"></i></div>
+                <h2 class="section-title">4. 데이터 구조 및 모듈 연동 명세</h2>
+            </div>
+            <div class="grid-2">
+                <div class="feature-card">
+                    <div class="feature-title">
+                        <i class="fa-solid fa-school" style="color: var(--primary);"></i>
+                        jingu_data.js (어린이보호구역 74건)
+                    </div>
+                    <div class="feature-desc">
+                        부산진구 관내 74개 보호구역 정제 데이터셋.<br>
+                        • <code>시설명</code>, <code>시설종류</code>, <code>위도/경도</code><br>
+                        • <code>CCTV설치여부</code> (Y/N), <code>CCTV설치대수</code><br>
+                        • <code>소재지주소</code>, <code>보호구역도로폭</code>, <code>관할경찰서명</code>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">
+                        <i class="fa-solid fa-people-group" style="color: var(--accent-purple);"></i>
+                        population_data.js (유동인구 60개 격자)
+                    </div>
+                    <div class="feature-desc">
+                        부산진구 60개 구역별 유동인구 바운딩 박스.<br>
+                        • <code>grid_id</code>: 격자 구역 식별코드<br>
+                        • <code>bounds</code>: <code>[[South, West], [North, East]]</code><br>
+                        • <code>population</code>: 해당 영역 유동인구 합계(명)
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Key Insight -->
+        <section id="insight" class="section">
+            <div class="section-header">
+                <div class="section-icon"><i class="fa-solid fa-lightbulb"></i></div>
+                <h2 class="section-title">5. 기대 효과 및 향후 발전 방향</h2>
+            </div>
+            <div class="grid-3">
+                <div class="feature-card">
+                    <div class="feature-title"><i class="fa-solid fa-shield-halved"
+                            style="color: var(--accent-green);"></i> 사각지대 선제적 해소</div>
+                    <div class="feature-desc">유동인구 밀집 스쿨존 중 CCTV 미설치 구역에 우선 설치 예산을 집행하여 어린이 안전사고 사전 예방</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title"><i class="fa-solid fa-sliders" style="color: var(--primary);"></i> 다차원
+                        레이어 확장</div>
+                    <div class="feature-desc">향후 신호등 현황, 어린이 교통사고 발생 이력, 속도제한 표지판 데이터 등과 결합하여 다차원 안전지수로 고도화</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title"><i class="fa-solid fa-eye" style="color: var(--accent-orange);"></i> 행정
+                        투명성 제고</div>
+                    <div class="feature-desc">주민과 학부모가 직접 자녀 통학로의 안전도를 데이터로 확인하고 구청에 시정을 요구할 수 있는 투명성 제공</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 하단 자세히 보기 버튼 섹션 -->
+        <div class="cta-section">
+            <a href="https://harry20090515-ai.github.io/AIkid2026/" target="_blank" rel="noopener noreferrer"
+                class="btn-detail">
+                <span>자세히 보기</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2026 AI2026 Portfolio - 부산진구 어린이보호구역 및 유동인구 입체 분석 지도 서비스 기획서</p>
+            <p style="margin-top: 8px;"><a href="../index.html">포트폴리오 메인 홈으로 돌아가기</a></p>
+        </footer>
+    </div>
+
+</body>
+
+</html>'Noto Sans KR', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* {
+box-sizing: border-box;
+margin: 0;
+padding: 0;
+}
+
+body {
+background-color: var(--bg-dark);
+background-image:
+radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.12) 0px, transparent 50%),
+radial-gradient(at 100% 100%, rgba(239, 68, 68, 0.08) 0px, transparent 50%),
+radial-gradient(at 50% 50%, rgba(139, 92, 246, 0.06) 0px, transparent 50%);
+background-attachment: fixed;
+color: var(--text-main);
+font-family: var(--font-family);
+line-height: 1.6;
+padding-bottom: 60px;
+}
+
+/* Top Header */
+.header {
+position: sticky;
+top: 0;
+z-index: 100;
+backdrop-filter: blur(16px);
+-webkit-backdrop-filter: blur(16px);
+background: rgba(9, 13, 22, 0.8);
+border-bottom: 1px solid var(--border-color);
+padding: 16px 32px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+
+.header-brand {
+display: flex;
+align-items: center;
+gap: 12px;
+text-decoration: none;
+color: var(--text-main);
+}
+
+.header-icon {
+width: 40px;
+height: 40px;
+background: linear-gradient(135deg, var(--primary), var(--accent-purple));
+border-radius: 10px;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 20px;
+color: #fff;
+box-shadow: 0 4px 14px var(--primary-glow);
+}
+
+.header-title {
+font-size: 1.15rem;
+font-weight: 700;
+letter-spacing: -0.02em;
+}
+
+.header-nav {
+display: flex;
+gap: 20px;
+}
+
+.header-nav a {
+color: var(--text-muted);
+text-decoration: none;
+font-size: 0.9rem;
+font-weight: 500;
+transition: color 0.2s;
+}
+
+.header-nav a:hover {
+color: var(--primary);
+}
+
+.container {
+max-width: 1200px;
+margin: 0 auto;
+padding: 40px 24px;
+}
+
+/* Hero Section */
+.hero {
+text-align: center;
+padding: 48px 24px;
+margin-bottom: 40px;
+position: relative;
+}
+
+.hero-badge {
+display: inline-flex;
+align-items: center;
+gap: 8px;
+padding: 6px 16px;
+background: rgba(59, 130, 246, 0.1);
+border: 1px solid rgba(59, 130, 246, 0.3);
+border-radius: 50px;
+color: #60a5fa;
+font-size: 0.85rem;
+font-weight: 600;
+margin-bottom: 20px;
+}
+
+.hero-title {
+font-size: 2.5rem;
+font-weight: 800;
+line-height: 1.25;
+margin-bottom: 16px;
+background: linear-gradient(135deg, #ffffff 30%, #93c5fd 100%);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+letter-spacing: -0.03em;
+}
+
+.hero-desc {
+font-size: 1.1rem;
+color: var(--text-muted);
+max-width: 800px;
+margin: 0 auto 32px;
+font-weight: 400;
+}
+
+.hero-stats {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+gap: 16px;
+margin-top: 32px;
+}
+
+.stat-card {
+background: var(--bg-card);
+backdrop-filter: blur(12px);
+border: 1px solid var(--border-color);
+border-radius: 16px;
+padding: 20px;
+text-align: center;
+transition: transform 0.2s, border-color 0.2s;
+}
+
+.stat-card:hover {
+transform: translateY(-3px);
+border-color: var(--border-glow);
+}
+
+.stat-value {
+font-size: 1.8rem;
+font-weight: 800;
+color: var(--primary);
+margin-bottom: 4px;
+}
+
+.stat-label {
+font-size: 0.85rem;
+color: var(--text-muted);
+}
+
+/* Section Cards */
+.section {
+background: var(--bg-card);
+backdrop-filter: blur(12px);
+border: 1px solid var(--border-color);
+border-radius: 20px;
+padding: 36px;
+margin-bottom: 32px;
+box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.section-header {
+display: flex;
+align-items: center;
+gap: 12px;
+margin-bottom: 24px;
+padding-bottom: 16px;
+border-bottom: 1px solid var(--border-color);
+}
+
+.section-icon {
+width: 36px;
+height: 36px;
+background: rgba(59, 130, 246, 0.15);
+border-radius: 10px;
+color: var(--primary);
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 18px;
+}
+
+.section-title {
+font-size: 1.4rem;
+font-weight: 700;
+color: #fff;
+letter-spacing: -0.02em;
+}
+
+/* Cards & Grid Layouts */
+.grid-2 {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+gap: 24px;
+}
+
+.grid-3 {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+gap: 20px;
+}
+
+.feature-card {
+background: rgba(255, 255, 255, 0.03);
+border: 1px solid var(--border-color);
+border-radius: 14px;
+padding: 24px;
+transition: all 0.2s;
+}
+
+.feature-card:hover {
+background: rgba(255, 255, 255, 0.05);
+border-color: rgba(255, 255, 255, 0.15);
+}
+
+.feature-title {
+font-size: 1.05rem;
+font-weight: 600;
+color: #fff;
+margin-bottom: 10px;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
+.feature-desc {
+font-size: 0.9rem;
+color: var(--text-muted);
+line-height: 1.6;
+}
+
+/* Styled Table */
+.table-wrapper {
+width: 100%;
+overflow-x: auto;
+border-radius: 12px;
+border: 1px solid var(--border-color);
+}
+
+table {
+width: 100%;
+border-collapse: collapse;
+text-align: left;
+font-size: 0.9rem;
+}
+
+th {
+background: rgba(30, 41, 59, 0.8);
+color: #94a3b8;
+padding: 14px 18px;
+font-weight: 600;
+border-bottom: 1px solid var(--border-color);
+}
+
+td {
+padding: 16px 18px;
+border-bottom: 1px solid var(--border-color);
+color: var(--text-main);
+}
+
+tr:last-child td {
+border-bottom: none;
+}
+
+tr:hover td {
+background: rgba(255, 255, 255, 0.02);
+}
+
+.badge {
+display: inline-block;
+padding: 4px 10px;
+border-radius: 6px;
+font-size: 0.75rem;
+font-weight: 600;
+}
+
+.badge-blue {
+background: rgba(37, 99, 235, 0.2);
+color: #60a5fa;
+border: 1px solid rgba(37, 99, 235, 0.4);
+}
+
+.badge-red {
+background: rgba(239, 68, 68, 0.2);
+color: #f87171;
+border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.badge-purple {
+background: rgba(139, 92, 246, 0.2);
+color: #c084fc;
+border: 1px solid rgba(139, 92, 246, 0.4);
+}
+
+/* Mockup Visual UI */
+.mockup-container {
+background: #0b1120;
+border: 1px solid rgba(255, 255, 255, 0.12);
+border-radius: 16px;
+overflow: hidden;
+box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+margin-top: 20px;
+}
+
+.mockup-header {
+background: #1e293b;
+padding: 12px 20px;
+display: flex;
+align-items: center;
+gap: 12px;
+border-bottom: 1px solid var(--border-color);
+}
+
+.dots {
+display: flex;
+gap: 6px;
+}
+
+.dot {
+width: 10px;
+height: 10px;
+border-radius: 50%;
+}
+
+.dot-red { background: #ef4444; }
+.dot-yellow { background: #f59e0b; }
+.dot-green { background: #10b981; }
+
+.mockup-title {
+font-size: 0.8rem;
+color: var(--text-muted);
+font-family: monospace;
+}
+
+.mockup-body {
+display: grid;
+grid-template-columns: 280px 1fr;
+min-height: 420px;
+}
+
+@media (max-width: 768px) {
+.mockup-body {
+grid-template-columns: 1fr;
+}
+}
+
+.mockup-sidebar {
+background: #0f172a;
+border-right: 1px solid var(--border-color);
+padding: 16px;
+display: flex;
+flex-direction: column;
+gap: 12px;
+}
+
+.mockup-input {
+background: #1e293b;
+border: 1px solid var(--border-color);
+border-radius: 6px;
+padding: 8px 12px;
+font-size: 0.8rem;
+color: var(--text-muted);
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
+.mockup-card {
+background: rgba(30, 41, 59, 0.5);
+border: 1px solid var(--border-color);
+border-radius: 8px;
+padding: 12px;
+font-size: 0.8rem;
+}
+
+.mockup-map {
+background: #090d16;
+position: relative;
+background-image:
+linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+background-size: 30px 30px;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 20px;
+}
+
+.mock-pin {
+position: absolute;
+width: 28px;
+height: 28px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 12px;
+color: white;
+box-shadow: 0 0 12px currentColor;
+cursor: pointer;
+}
+
+.mock-pin-blue { background: #2563eb; color: #2563eb; top: 35%; left: 40%; }
+.mock-pin-red { background: #ef4444; color: #ef4444; top: 60%; left: 65%; }
+
+.mock-heat {
+position: absolute;
+width: 140px;
+height: 100px;
+background: radial-gradient(circle, rgba(239,68,68,0.3) 0%, rgba(249,115,22,0.2) 50%, transparent 70%);
+top: 45%;
+left: 55%;
+border-radius: 40%;
+border: 1px dashed rgba(239, 68, 68, 0.4);
+}
+
+.mock-popup {
+position: absolute;
+top: 20%;
+left: 45%;
+background: #1e293b;
+border: 1px solid var(--primary);
+border-radius: 8px;
+padding: 12px;
+width: 220px;
+box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+font-size: 0.75rem;
+z-index: 10;
+}
+
+/* Footer */
+.footer {
+text-align: center;
+padding: 32px 0 0;
+color: var(--text-dim);
+font-size: 0.85rem;
+border-top: 1px solid var(--border-color);
+margin-top: 40px;
+}
+
+.footer a {
+color: var(--text-muted);
+text-decoration: none;
+}
+
+.footer a:hover {
+color: var(--primary);
+}
+</style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <a href="../index.html" class="header-brand">
+            <div class="header-icon">
+                <i class="fa-solid fa-shield-cat"></i>
+            </div>
+            <div class="header-title">부산진구 어린이보호구역 입체 분석</div>
+        </a>
+        <nav class="header-nav">
+            <a href="#overview">개요</a>
+            <a href="#target">활용 대상</a>
+            <a href="#ui">화면 구성</a>
+            <a href="#data">데이터 명세</a>
+            <a href="#insight">정책 효과</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- Hero -->
+        <section class="hero">
+            <div class="hero-badge">
+                <i class="fa-solid fa-file-code"></i> 기획 명세서 & 서비스 설명서 (Service PRD)
+            </div>
+            <h1 class="hero-title">부산진구 어린이보호구역 및<br>유동인구 입체 분석 지도 서비스</h1>
+            <p class="hero-desc">
+                부산광역시 진구 내 74개 어린이보호구역 현황과 60개 격자별 유동인구 분석 데이터를 융합하여,<br>
+                CCTV 미설치 스쿨존 및 유동인구 밀집 안전 사각지대를 입체적으로 시각화하는 인터랙티브 대시보드 기획안입니다.
+            </p>
+
+            <div class="hero-stats">
+                <div class="stat-card">
+                    <div class="stat-value">74개소</div>
+                    <div class="stat-label">부산진구 관내 어린이보호구역</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">60개 구역</div>
+                    <div class="stat-label">유동인구 격자 바운딩 박스</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">2D/3D Layer</div>
+                    <div class="stat-label">CCTV 핀 & 히트맵 오버레이</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">Risk Cross</div>
+                    <div class="stat-label">고위험 사각지대 교차 분석</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1. Overview -->
+        <section id="overview" class="section">
+            <div class="section-header">
+                <div class="section-icon"><i class="fa-solid fa-bullseye"></i></div>
+                <h2 class="section-title">1. 프로젝트 개요 및 배경</h2>
+            </div>
+            <div class="grid-2">
+                <div class="feature-card">
+                    <div class="feature-title">
+                        <i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-red);"></i>
+                        어린이 교통안전 사각지대 발굴
+                    </div>
+                    <div class="feature-desc">
+                        단순 보호구역 지정을 넘어, 실제 통학 시간대 유동인구가 밀집하는 지역 중 CCTV가 미설치된 **고위험 사각지대**를 수치화하여 직관적으로 분석합니다.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">
+                        <i class="fa-solid fa-chart-pie" style="color: var(--primary);"></i>
+                        데이터 기반 정책 의사결정
+                    </div>
+                    <div class="feature-desc">
+                        부산진구청 및 부산진경찰서 등 관계 기관이 CCTV 신규 설치, 보차도 분리 등 안전 시설물 우선 투자 구역을 합리적으로 선정할 수 있도록 데이터 근거를 제공합니다.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Target Users -->
+        <section id="target" class="section">
+            <div class="section-header">
+                <div class="section-icon"><i class="fa-solid fa-users"></i></div>
+                <h2 class="section-title">2. 타겟 사용자 및 활용 시나리오</h2>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>구분</th>
+                            <th>주요 사용자</th>
+                            <th>주요 활용 시나리오</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-blue">지자체 / 경찰서</span></td>
+                            <td>부산진구청 교통행정과, 부산진경찰서</td>
+                            <td>• 유동인구 대비 CCTV 미설치 스쿨존 우선 순위 검토<br>• 어린이보호구역 개선 예산의 효율적 배정 및 시설 실태 파악</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-purple">주민 / 학부모</span></td>
+                            <td>진구 거주 학부모 및 보호자</td>
+                            <td>• 자녀 통학로 주변 CCTV 설치 여부 및 위험도 확인<br>• 스쿨존 내 안전 시설물 개선 건의를 위한 정량적 데이터 확보</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-red">연구자 / 시민단체</span></td>
+                            <td>도시계획·교통안전 연구자</td>
+                            <td>• 유동인구 시공간 패턴과 스쿨존 안전 시설물 간의 상호작용 분석</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 3. UI/UX Composition -->
+        <section id="ui" class="section">
+            <div class="section-header">
+                <div class="section-icon"><i class="fa-solid fa-desktop"></i></div>
+                <h2 class="section-title">3. 대시보드 화면 구성 & UI 레이아웃</h2>
+            </div>
+            <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.95rem;">
+                대시보드는 **Modern Dark Glassmorphic UI** 스타일을 적용하여, 시각적 몰입감과 분석 집중도를 극대화합니다.
+            </p>
+
+            <!-- Mockup Diagram -->
+            <div class="mockup-container">
+                <div class="mockup-header">
+                    <div class="dots">
+                        <div class="dot dot-red"></div>
+                        <div class="dot dot-yellow"></div>
+                        <div class="dot dot-green"></div>
+                    </div>
+                    <div class="mockup-title">https://ai2026.github.io/kids/dashboard - Layout Preview</div>
+                </div>
+                <div class="mockup-body">
+                    <div class="mockup-sidebar">
+                        <div class="mockup-input">
+                            <i class="fa-solid fa-magnifying-glass"></i> 시설명 검색 (예: 초등학교)
+                        </div>
+                        <div class="mockup-card">
+                            <div style="font-weight: 600; color: #fff; margin-bottom: 4px;">🎯 스마트 필터</div>
+                            <div style="color: var(--text-muted); font-size: 0.75rem;">• 시설종류: 전체 / 초등 / 유치원</div>
+                            <div style="color: var(--text-muted); font-size: 0.75rem;">• CCTV여부: 전체 / Y / N</div>
+                        </div>
+                        <div class="mockup-card"
+                            style="border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.1);">
+                            <div style="font-weight: 600; color: #f87171; margin-bottom: 4px;">🚨 안전 사각지대 지표</div>
+                            <div style="color: #fca5a5; font-size: 0.85rem; font-weight: 700;">유동인구 High & CCTV 미설치
+                            </div>
+                        </div>
+                        <div class="mockup-card" style="flex: 1;">
+                            <div style="font-weight: 600; color: #fff; margin-bottom: 6px;">📋 보호구역 시설 목록</div>
+                            <div
+                                style="color: var(--text-muted); font-size: 0.75rem; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                1. 성지초등학교 <span class="badge badge-blue" style="font-size:0.65rem">CCTV Y</span></div>
+                            <div style="color: var(--text-muted); font-size: 0.75rem; padding: 4px 0;">2. 벽산유치원 <span
+                                    class="badge badge-red" style="font-size:0.65rem">CCTV N</span></div>
+                        </div>
+                    </div>
+                    <div class="mockup-map">
+                        <div class="mock-heat"></div>
+                        <div class="mock-pin mock-pin-blue" title="CCTV 설치 (Y)"><i class="fa-solid fa-video"></i></div>
+                        <div class="mock-pin mock-pin-red" title="CCTV 미설치 (N)"><i class="fa-solid fa-video-slash"></i>
+                        </div>
+
+                        <div class="mock-popup">
+                            <div style="font-weight: 700; color: #fff; margin-bottom: 4px;">📍 벽산유치원</div>
+                            <div style="color: var(--text-muted);">• 도로명: 부산진구 초읍천로...</div>
+                            <div style="color: var(--text-muted);">• CCTV: <span
+                                    style="color:#ef4444; font-weight:bold;">미설치 (N)</span></div>
+                            <div style="color: var(--text-muted);">• 인근 유동인구: <span
+                                    style="color:#f97316; font-weight:bold;">14,250명</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Data Architecture -->
+        <section id="data" class="section">
+            <div class="section-header">
+                <div class="section-icon"><i class="fa-solid fa-database"></i></div>
+                <h2 class="section-title">4. 데이터 구조 및 모듈 연동 명세</h2>
+            </div>
+            <div class="grid-2">
+                <div class="feature-card">
+                    <div class="feature-title">
+                        <i class="fa-solid fa-school" style="color: var(--primary);"></i>
+                        jingu_data.js (어린이보호구역 74건)
+                    </div>
+                    <div class="feature-desc">
+                        부산진구 관내 74개 보호구역 정제 데이터셋.<br>
+                        • <code>시설명</code>, <code>시설종류</code>, <code>위도/경도</code><br>
+                        • <code>CCTV설치여부</code> (Y/N), <code>CCTV설치대수</code><br>
+                        • <code>소재지주소</code>, <code>보호구역도로폭</code>, <code>관할경찰서명</code>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">
+                        <i class="fa-solid fa-people-group" style="color: var(--accent-purple);"></i>
+                        population_data.js (유동인구 60개 격자)
+                    </div>
+                    <div class="feature-desc">
+                        부산진구 60개 구역별 유동인구 바운딩 박스.<br>
+                        • <code>grid_id</code>: 격자 구역 식별코드<br>
+                        • <code>bounds</code>: <code>[[South, West], [North, East]]</code><br>
+                        • <code>population</code>: 해당 영역 유동인구 합계(명)
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Key Insight -->
+        <section id="insight" class="section">
+            <div class="section-header">
+                <div class="section-icon"><i class="fa-solid fa-lightbulb"></i></div>
+                <h2 class="section-title">5. 기대 효과 및 향후 발전 방향</h2>
+            </div>
+            <div class="grid-3">
+                <div class="feature-card">
+                    <div class="feature-title"><i class="fa-solid fa-shield-halved"
+                            style="color: var(--accent-green);"></i> 사각지대 선제적 해소</div>
+                    <div class="feature-desc">유동인구 밀집 스쿨존 중 CCTV 미설치 구역에 우선 설치 예산을 집행하여 어린이 안전사고 사전 예방</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title"><i class="fa-solid fa-sliders" style="color: var(--primary);"></i> 다차원
+                        레이어 확장</div>
+                    <div class="feature-desc">향후 신호등 현황, 어린이 교통사고 발생 이력, 속도제한 표지판 데이터 등과 결합하여 다차원 안전지수로 고도화</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title"><i class="fa-solid fa-eye" style="color: var(--accent-orange);"></i> 행정
+                        투명성 제고</div>
+                    <div class="feature-desc">주민과 학부모가 직접 자녀 통학로의 안전도를 데이터로 확인하고 구청에 시정을 요구할 수 있는 투명성 제공</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2026 AI2026 Portfolio - 부산진구 어린이보호구역 및 유동인구 입체 분석 지도 서비스 기획서</p>
+            <p style="margin-top: 8px;"><a href="../index.html">포트폴리오 메인 홈으로 돌아가기</a></p>
+        </footer>
+    </div>
+
+</body>
+
+</html>
