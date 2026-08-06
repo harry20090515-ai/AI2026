@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="ko" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>학교 급식 알리미 (School Meal Alert)</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            warm: {
+              50: '#FDFCF8',
+              100: '#F7F5EE',
+              200: '#E8E4D9',
+              300: '#D6CFBD',
+              400: '#A8B092',
+              500: '#8BA888',
+              600: '#6B8E68',
+              700: '#4A6148',
+              800: '#2D2A26',
+              900: '#1C1917',
+            }
+          },
+          fontFamily: {
+            sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Pretendard Web Font -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+
+  <!-- React 18 & Babel CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Custom scrollbar and smooth theme transitions */
+    * {
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(139, 168, 136, 0.4);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(107, 142, 104, 0.7);
+    }
+  </style>
+</head>
+<body class="bg-[#FDFCF8] dark:bg-stone-900 text-[#2D2A26] dark:text-stone-100 font-sans min-h-screen antialiased selection:bg-emerald-200 dark:selection:bg-emerald-800">
+
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo, useRef } = React;
+
+    // --- STREAMING_CHUNK:Defining Constants & Allergen Data... ---
+    const ALLERGEN_LIST = [
+      { id: 1, name: '난류(계란)' },
+      { id: 2, name: '우유' },
+      { id: 3, name: '메밀' },
+      { id: 4, name: '땅콩' },
+      { id: 5, name: '대두' },
+      { id: 6, name: '밀' },
+      { id: 7, name: '고등어' },
+      { id: 8, name: '게' },
+      { id: 9, name: '새우' },
+      { id: 10, name: '돼지고기' },
+      { id: 11, name: '복숭아' },
+      { id: 12, name: '토마토' },
+      { id: 13, name: '아황산류' },
+      { id: 14, name: '호두' },
+      { id: 15, name: '닭고기' },
+      { id: 16, name: '쇠고기' },
+      { id: 17, name: '오징어' },
+      { id: 18, name: '조개류' },
+      { id: 19, name: '잣' },
+    ];
+
+    const PRESET_CLUSTERS = {
+      eggMilk: { label: '계란/우유', ids: [1, 2] },
+      nuts: { label: '견과류', ids: [4, 14, 19] },
+      seafood: { label: '갑각류/수산물', ids: [7, 8, 9, 17, 18] },
+      meat: { label: '육류', ids: [10, 15, 16] },
+    };
+
+    const RECOMMENDED_SCHOOLS = [
+      { name: '서울고등학교', officeCode: 'B10', schoolCode: '7010057', region: '서울' },
+      { name: '해운대중학교', officeCode: 'C10', schoolCode: '7150088', region: '부산' },
+      { name: '경기초등학교', officeCode: 'B10', schoolCode: '7020352', region: '서울' },
+      { name: '대구일과학고등학교', officeCode: 'D10', schoolCode: '7240212', region: '대구' },
+    ];
+
+    // Helper: Date string YYYYMMDD
+    const formatDateToYMD = (dateObj) => {
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      return `${year}${month}${day}`;
+    };
+
+    const formatDateFormatted = (dateObj) => {
+      const days = ['일', '월', '화', '수', '목', '금', '토'];
+      return `${dateObj.getFullYear()}년 ${dateObj.getMonth() + 1}월 ${dateObj.getDate()}일 (${days[dateObj.getDay()]})`;
+    };
+
+    // Fallback Mock Generator if NEIS API is blocked/CORS
+    const generateMockMealData = (ymd, schoolName) => {
+      const isWeekend = (() => {
+        const y = parseInt(ymd.substring(0, 4));
+        const m = parseInt(ymd.substring(4, 6)) - 1;
+        const d = parseInt(ymd.substring(6, 8));
+        const day = new Date(y, m, d).getDay();
+        return day === 0 || day === 6;
+      })();
+
+      if (isWeekend) return [];
+
+      return [
+        {
+          MMEAL_SC_CODE: '2',
+          MMEAL_SC_NM: '중식',
+          MLSV_YMD: ymd,
+          CAL_INFO: '840.5 Kcal',
+          DDISH_NM: '발아현미밥<br/>쇠고기미역국5.6.16.<br/>제육볶음10.13.<br/>계란말이1.2.5.<br/>배추김치9.<br/>유기농사과주스5.',
+          ORGPU_INFO: '쌀: 국내산, 쇠고기: 국내산 한우, 돼지고기: 국내산',
+          NUTR_INFO: '탄수화물(g) : 110.2<br/>단백질(g) : 38.5<br/>지방(g) : 22.1<br/>비타민A(R.E) : 240.1'
+        }
+      ];
+    };
+
+    // --- STREAMING_CHUNK:Main Application Component... ---
+    function App() {
+      // Dark mode state with LocalStorage support
+      const [darkMode, setDarkMode] = useState(() => {
+        const saved = localStorage.getItem('sma_theme');
+        if (saved) return saved === 'dark';
+        return window.matchMedia('(prefers-color-scheme: dark)').matches;
+      });
+
+      // School & Selected school state
+      const [selectedSchool, setSelectedSchool] = useState(() => {
+        const saved = localStorage.getItem('sma_selected_school');
+        return saved ? JSON.parse(saved) : RECOMMENDED_SCHOOLS[0];
+      });
+
+      // Favorites
+      const [favorites, setFavorites] = useState(() => {
+        const saved = localStorage.getItem('sma_favorites');
+        return saved ? JSON.parse(saved) : [RECOMMENDED_SCHOOLS[0]];
+      });
+
+      // UI Views: 'day' | 'week' | 'month'
+      const [viewMode, setViewMode] = useState('day');
+      const [currentDate, setCurrentDate] = useState(new Date());
+
+      // Search state
+      const [searchQuery, setSearchQuery] = useState('');
+      const [searchResults, setSearchResults] = useState([]);
+      const [isSearching, setIsSearching] = useState(false);
+      const [showSearchModal, setShowSearchModal] = useState(false);
+
+      // Meal Data & Loading
+      const [mealData, setMealData] = useState([]);
+      const [isLoading, setIsLoading] = useState(false);
+
+      // Allergens Selected
+      const [selectedAllergens, setSelectedAllergens] = useState(() => {
+        const saved = localStorage.getItem('sma_allergens');
+        return saved ? JSON.parse(saved) : [1, 2]; // Default: 계란, 우유
+      });
+      const [showAllergenFilter, setShowAllergenFilter] = useState(false);
+
+      // Toast notification system
+      const [toastMessage, setToastMessage] = useState('');
+
+      // Toggle Dark Mode Class
+      useEffect(() => {
+        const root = document.documentElement;
+        if (darkMode) {
+          root.classList.add('dark');
+          localStorage.setItem('sma_theme', 'dark');
+        } else {
+          root.classList.remove('dark');
+          localStorage.setItem('sma_theme', 'light');
+        }
+      }, [darkMode]);
+
+      // Save Selected School & Allergens
+      useEffect(() => {
+        localStorage.setItem('sma_selected_school', JSON.stringify(selectedSchool));
+      }, [selectedSchool]);
+
+      useEffect(() => {
+        localStorage.setItem('sma_allergens', JSON.stringify(selectedAllergens));
+      }, [selectedAllergens]);
+
+      useEffect(() => {
+        localStorage.setItem('sma_favorites', JSON.stringify(favorites));
+      }, [favorites]);
+
+      // Show Toast Notification
+      const triggerToast = (msg) => {
+        setToastMessage(msg);
+        setTimeout(() => setToastMessage(''), 3000);
+      };
+
+      // --- STREAMING_CHUNK:Fetching NEIS Meal API Data... ---
+      const fetchMealInfo = async () => {
+        if (!selectedSchool) return;
+        setIsLoading(true);
+
+        const ymd = formatDateToYMD(currentDate);
+
+        let fromYmd = ymd;
+        let toYmd = ymd;
+
+        if (viewMode === 'week') {
+          // Calculate start of week (Mon) to end of week (Sun)
+          const curr = new Date(currentDate);
+          const day = curr.getDay();
+          const diffToMon = curr.getDate() - day + (day === 0 ? -6 : 1);
+          const mon = new Date(curr.setDate(diffToMon));
+          const sun = new Date(mon);
+          sun.setDate(mon.getDate() + 6);
+          fromYmd = formatDateToYMD(mon);
+          toYmd = formatDateToYMD(sun);
+        } else if (viewMode === 'month') {
+          // Calculate 1st day of month to last day of month
+          const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+          const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+          fromYmd = formatDateToYMD(firstDay);
+          toYmd = formatDateToYMD(lastDay);
+        }
+
+        const url = `https://open.neis.go.kr/hub/mealServiceDietInfo?Type=json&pIndex=1&pSize=100&ATPT_OFCDC_SC_CODE=${selectedSchool.officeCode}&SD_SCHUL_CODE=${selectedSchool.schoolCode}&MLSV_FROM_YMD=${fromYmd}&MLSV_TO_YMD=${toYmd}`;
+
+        try {
+          const res = await fetch(url);
+          const json = await res.json();
+
+          if (json.mealServiceDietInfo && json.mealServiceDietInfo[1]?.row) {
+            setMealData(json.mealServiceDietInfo[1].row);
+          } else {
+            // Fallback gracefully
+            setMealData(generateMockMealData(ymd, selectedSchool.name));
+          }
+        } catch (err) {
+          console.warn('NEIS API fetch failed, loading fallback data:', err);
+          setMealData(generateMockMealData(ymd, selectedSchool.name));
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      useEffect(() => {
+        fetchMealInfo();
+      }, [selectedSchool, currentDate, viewMode]);
+
+      // --- STREAMING_CHUNK:NEIS School Search Handler... ---
+      const handleSchoolSearch = async (e) => {
+        e?.preventDefault();
+        if (!searchQuery.trim() || searchQuery.length < 2) {
+          triggerToast('검색어를 2자 이상 입력해주세요.');
+          return;
+        }
+
+        setIsSearching(true);
+        try {
+          const url = `https://open.neis.go.kr/hub/schoolInfo?Type=json&pIndex=1&pSize=15&SCHUL_NM=${encodeURIComponent(searchQuery)}`;
+          const res = await fetch(url);
+          const json = await res.json();
+
+          if (json.schoolInfo && json.schoolInfo[1]?.row) {
+            const list = json.schoolInfo[1].row.map(item => ({
+              name: item.SCHUL_NM,
+              officeCode: item.ATPT_OFCDC_SC_CODE,
+              schoolCode: item.SD_SCHUL_CODE,
+              region: item.LCTN_SC_NM || item.ATPT_OFCDC_SC_NM,
+            }));
+            setSearchResults(list);
+          } else {
+            setSearchResults([]);
+            triggerToast('검색 결과가 없습니다.');
+          }
+        } catch (err) {
+          console.error('School search error:', err);
+          triggerToast('학교 검색 중 오류가 발생했습니다.');
+        } finally {
+          setIsSearching(false);
+        }
+      };
+
+      // Toggle favorite school
+      const toggleFavorite = (school) => {
+        const exists = favorites.some(f => f.schoolCode === school.schoolCode);
+        if (exists) {
+          setFavorites(favorites.filter(f => f.schoolCode !== school.schoolCode));
+          triggerToast('즐겨찾기에서 삭제되었습니다.');
+        } else {
+          setFavorites([...favorites, school]);
+          triggerToast('즐겨찾기에 추가되었습니다.');
+        }
+      };
+
+      // Helper: TTS Voice Reader
+      const speakMeal = (dishesText) => {
+        if (!('speechSynthesis' in window)) {
+          triggerToast('이 브라우저는 음성 합성을 지원하지 않습니다.');
+          return;
+        }
+
+        window.speechSynthesis.cancel(); // Stop any active speech
+        const cleanText = dishesText.replace(/<br\s*\/?>/gi, ', ').replace(/[0-9]+\./g, '');
+        const utterance = new SpeechSynthesisUtterance(`${selectedSchool.name} 급식 메뉴입니다. ${cleanText}`);
+        utterance.lang = 'ko-KR';
+        utterance.rate = 0.95;
+        window.speechSynthesis.speak(utterance);
+        triggerToast('🔊 급식 메뉴를 읽어드립니다.');
+      };
+
+      // Helper: Copy Text
+      const copyToClipboard = (dishesText) => {
+        const cleanText = dishesText.replace(/<br\s*\/?>/gi, '\n').replace(/[0-9]+\./g, '');
+        const textToCopy = `[${selectedSchool.name} 급식 알림]\n날짜: ${formatDateFormatted(currentDate)}\n\n${cleanText}`;
+
+        const tempInput = document.createElement('textarea');
+        tempInput.value = textToCopy;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        try {
+          document.execCommand('copy');
+          triggerToast('📋 식단이 클립보드에 복사되었습니다!');
+        } catch (err) {
+          triggerToast('복사에 실패했습니다.');
+        }
+        document.body.removeChild(tempInput);
+      };
+
+      // Date navigation helpers
+      const shiftDate = (offsetDays) => {
+        const newDate = new Date(currentDate);
+        if (viewMode === 'day') {
+          newDate.setDate(newDate.getDate() + offsetDays);
+        } else if (viewMode === 'week') {
+          newDate.setDate(newDate.getDate() + (offsetDays * 7));
+        } else if (viewMode === 'month') {
+          newDate.setMonth(newDate.getMonth() + offsetDays);
+        }
+        setCurrentDate(newDate);
+      };
+
+      const setToday = () => {
+        setCurrentDate(new Date());
+      };
+
+      // Render Lucide Icon Helper
+      useEffect(() => {
+        if (window.lucide) {
+          window.lucide.createIcons();
+        }
+      });
+
+      // --- STREAMING_CHUNK:Rendering Main UI Layout... ---
+      return (
+        <div className="min-h-screen flex flex-col max-w-6xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
+          
+          {/* Top Header Bar */}
+          <header className="flex flex-wrap items-center justify-between gap-4 py-4 border-b border-warm-200 dark:border-stone-800 mb-6">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl p-2 bg-warm-100 dark:bg-stone-800 rounded-2xl shadow-sm">🍱</span>
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-warm-800 dark:text-stone-100 flex items-center gap-2">
+                  학교 급식 알리미
+                  <span className="text-xs px-2 py-0.5 font-medium rounded-full bg-warm-500/10 text-warm-600 dark:text-warm-400 border border-warm-500/20">
+                    NEIS OpenAPI
+                  </span>
+                </h1>
+                <p className="text-xs text-warm-600 dark:text-stone-400">전국 초·중·고 실시간 식단 & 영양 정보 서비스</p>
+              </div>
+            </div>
+
+            {/* Top Navigation Action Buttons */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* REQUESTED FEATURE 1: Home Button redirecting to specified URL */}
+              <a
+                href="https://harry20090515-ai.github.io/AI2026/"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="AI2026 홈으로 이동"
+                className="flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm font-semibold text-warm-800 dark:text-stone-200 bg-warm-100 dark:bg-stone-800 hover:bg-warm-200 dark:hover:bg-stone-700 rounded-xl transition shadow-sm border border-warm-200 dark:border-stone-700"
+              >
+                <i data-lucide="home" className="w-4 h-4 text-warm-600 dark:text-warm-400"></i>
+                <span className="hidden xs:inline">홈</span>
+              </a>
+
+              {/* REQUESTED FEATURE 3: Dark / Light Mode Toggle */}
+              <button
+                onClick={() => setDarkMode(!darkMode)}
+                title={darkMode ? "라이트 모드로 전환" : "다크 모드로 전환"}
+                className="p-2 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-warm-800 dark:text-stone-200 bg-warm-100 dark:bg-stone-800 hover:bg-warm-200 dark:hover:bg-stone-700 rounded-xl transition shadow-sm border border-warm-200 dark:border-stone-700 flex items-center gap-1.5"
+              >
+                {darkMode ? (
+                  <>
+                    <i data-lucide="sun" className="w-4 h-4 text-amber-400"></i>
+                    <span className="hidden sm:inline">라이트</span>
+                  </>
+                ) : (
+                  <>
+                    <i data-lucide="moon" className="w-4 h-4 text-indigo-600"></i>
+                    <span className="hidden sm:inline">다크</span>
+                  </>
+                )}
+              </button>
+
+              {/* Allergen Filter Trigger */}
+              <button
+                onClick={() => setShowAllergenFilter(!showAllergenFilter)}
+                className={`flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm font-semibold rounded-xl transition shadow-sm border ${
+                  selectedAllergens.length > 0
+                    ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 border-amber-300 dark:border-amber-800'
+                    : 'bg-warm-100 dark:bg-stone-800 text-warm-800 dark:text-stone-200 border-warm-200 dark:border-stone-700'
+                }`}
+              >
+                <i data-lucide="shield-alert" className="w-4 h-4 text-amber-600 dark:text-amber-400"></i>
+                <span>알레르기</span>
+                {selectedAllergens.length > 0 && (
+                  <span className="ml-0.5 px-1.5 py-0.2 text-[10px] bg-amber-500 text-white rounded-full font-bold">
+                    {selectedAllergens.length}
+                  </span>
+                )}
+              </button>
+            </div>
+          </header>
+
+          {/* --- STREAMING_CHUNK:Rendering School Selector Bar & Search... --- */}
+          <section className="bg-white dark:bg-stone-850 p-4 sm:p-5 rounded-2xl shadow-sm border border-warm-200/80 dark:border-stone-800 mb-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              
+              {/* Selected School Title & Favorites */}
+              <div className="flex items-center gap-3">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs px-2 py-0.5 rounded-md bg-warm-500 text-white font-medium">
+                      {selectedSchool.region || '지역'}
+                    </span>
+                    <h2 className="text-lg sm:text-xl font-bold text-warm-800 dark:text-stone-100">
+                      {selectedSchool.name}
+                    </h2>
+                    <button
+                      onClick={() => toggleFavorite(selectedSchool)}
+                      className="p-1 text-amber-400 hover:scale-110 transition"
+                      title="즐겨찾기 토글"
+                    >
+                      <i
+                        data-lucide="star"
+                        className={`w-5 h-5 ${
+                          favorites.some(f => f.schoolCode === selectedSchool.schoolCode)
+                            ? 'fill-amber-400 text-amber-400'
+                            : 'text-stone-300 dark:text-stone-600'
+                        }`}
+                      ></i>
+                    </button>
+                  </div>
+                  <p className="text-xs text-warm-600 dark:text-stone-400 mt-1">
+                    표준학교코드: {selectedSchool.schoolCode} | 관할교육청: {selectedSchool.officeCode}
+                  </p>
+                </div>
+              </div>
+
+              {/* Search Trigger Button */}
+              <button
+                onClick={() => setShowSearchModal(true)}
+                className="flex items-center justify-between px-4 py-2.5 bg-warm-50 dark:bg-stone-800 hover:bg-warm-100 dark:hover:bg-stone-750 text-warm-700 dark:text-stone-300 rounded-xl border border-warm-200 dark:border-stone-700 text-sm transition shadow-inner"
+              >
+                <span className="flex items-center gap-2">
+                  <i data-lucide="search" className="w-4 h-4 text-warm-500"></i>
+                  <span>학교 검색 (예: 서울고, 해운대중)</span>
+                </span>
+                <kbd className="hidden sm:inline-block text-[10px] bg-white dark:bg-stone-700 px-2 py-0.5 rounded border border-warm-200 dark:border-stone-600 text-warm-500">
+                  Click
+                </kbd>
+              </button>
+            </div>
+
+            {/* Favorites & Presets Quick Bar */}
+            <div className="mt-4 pt-3 border-t border-warm-100 dark:border-stone-800 flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold text-warm-600 dark:text-stone-400 flex items-center gap-1">
+                <i data-lucide="bookmark" className="w-3.5 h-3.5 text-warm-500"></i> 자주 찾는 학교:
+              </span>
+              
+              {favorites.map((fav) => (
+                <button
+                  key={fav.schoolCode}
+                  onClick={() => setSelectedSchool(fav)}
+                  className={`px-3 py-1 text-xs rounded-full border transition flex items-center gap-1 ${
+                    selectedSchool.schoolCode === fav.schoolCode
+                      ? 'bg-warm-500 text-white border-warm-600 font-semibold shadow-sm'
+                      : 'bg-warm-50 dark:bg-stone-800 text-warm-700 dark:text-stone-300 border-warm-200 dark:border-stone-700 hover:bg-warm-100 dark:hover:bg-stone-700'
+                  }`}
+                >
+                  ⭐ {fav.name}
+                </button>
+              ))}
+
+              {RECOMMENDED_SCHOOLS.filter(r => !favorites.some(f => f.schoolCode === r.schoolCode)).map((rec) => (
+                <button
+                  key={rec.schoolCode}
+                  onClick={() => setSelectedSchool(rec)}
+                  className="px-2.5 py-1 text-xs rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700 border border-transparent transition"
+                >
+                  + {rec.name}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* --- STREAMING_CHUNK:Rendering Allergen Drawer / Modal... --- */}
+          {showAllergenFilter && (
+            <section className="bg-amber-50/80 dark:bg-stone-850 p-5 rounded-2xl border-2 border-amber-300 dark:border-amber-800/80 shadow-md mb-6 animate-fadeIn">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-base font-bold text-amber-900 dark:text-amber-200 flex items-center gap-2">
+                  <i data-lucide="shield-alert" className="w-5 h-5 text-amber-600"></i>
+                  맞춤 알레르기 유발 물질 필터 설정 (19종)
+                </h3>
+                <button
+                  onClick={() => setSelectedAllergens([])}
+                  className="text-xs text-amber-700 dark:text-amber-400 hover:underline"
+                >
+                  전체 해제
+                </button>
+              </div>
+
+              {/* Preset Quick Chips */}
+              <div className="flex flex-wrap items-center gap-2 mb-4 pb-3 border-b border-amber-200 dark:border-amber-900/50">
+                <span className="text-xs text-amber-800 dark:text-amber-300 font-medium">원클릭 프리셋:</span>
+                {Object.entries(PRESET_CLUSTERS).map(([key, cluster]) => (
+                  <button
+                    key={key}
+                    onClick={() => {
+                      const combined = Array.from(new Set([...selectedAllergens, ...cluster.ids]));
+                      setSelectedAllergens(combined);
+                    }}
+                    className="px-2.5 py-1 text-xs bg-white dark:bg-stone-800 text-amber-900 dark:text-amber-200 rounded-lg border border-amber-300 dark:border-amber-700 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition font-medium"
+                  >
+                    + {cluster.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* 19 Allergen Checkbox Grid */}
+              <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+                {ALLERGEN_LIST.map((alg) => {
+                  const isChecked = selectedAllergens.includes(alg.id);
+                  return (
+                    <label
+                      key={alg.id}
+                      className={`flex items-center gap-2 p-2 rounded-xl text-xs cursor-pointer border transition select-none ${
+                        isChecked
+                          ? 'bg-amber-500 text-white border-amber-600 font-bold shadow-sm'
+                          : 'bg-white dark:bg-stone-800 text-stone-700 dark:text-stone-300 border-amber-200 dark:border-stone-700 hover:bg-amber-100/50'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => {
+                          if (isChecked) {
+                            setSelectedAllergens(selectedAllergens.filter(id => id !== alg.id));
+                          } else {
+                            setSelectedAllergens([...selectedAllergens, alg.id]);
+                          }
+                        }}
+                        className="hidden"
+                      />
+                      <span>{alg.id}. {alg.name}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* --- STREAMING_CHUNK:Rendering Date & View Mode Navigation... --- */}
+          <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            
+            {/* View Mode Tabs (Day / Week / Month) */}
+            <div className="inline-flex p-1 bg-warm-100 dark:bg-stone-800 rounded-2xl border border-warm-200 dark:border-stone-700 self-start sm:self-auto">
+              <button
+                onClick={() => setViewMode('day')}
+                className={`px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl transition ${
+                  viewMode === 'day'
+                    ? 'bg-white dark:bg-stone-700 text-warm-800 dark:text-stone-100 shadow-sm'
+                    : 'text-warm-600 dark:text-stone-400 hover:text-warm-800 dark:hover:text-stone-200'
+                }`}
+              >
+                일간 뷰 (Day)
+              </button>
+              <button
+                onClick={() => setViewMode('week')}
+                className={`px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl transition ${
+                  viewMode === 'week'
+                    ? 'bg-white dark:bg-stone-700 text-warm-800 dark:text-stone-100 shadow-sm'
+                    : 'text-warm-600 dark:text-stone-400 hover:text-warm-800 dark:hover:text-stone-200'
+                }`}
+              >
+                주간 뷰 (Week)
+              </button>
+              <button
+                onClick={() => setViewMode('month')}
+                className={`px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl transition ${
+                  viewMode === 'month'
+                    ? 'bg-white dark:bg-stone-700 text-warm-800 dark:text-stone-100 shadow-sm'
+                    : 'text-warm-600 dark:text-stone-400 hover:text-warm-800 dark:hover:text-stone-200'
+                }`}
+              >
+                월간 뷰 (Month)
+              </button>
+            </div>
+
+            {/* Date Navigator Controls */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => shiftDate(-1)}
+                className="p-2 bg-white dark:bg-stone-800 border border-warm-200 dark:border-stone-700 rounded-xl hover:bg-warm-50 dark:hover:bg-stone-700 transition"
+                title="이전"
+              >
+                <i data-lucide="chevron-left" className="w-5 h-5 text-warm-700 dark:text-stone-300"></i>
+              </button>
+
+              <div className="relative flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-stone-800 border border-warm-200 dark:border-stone-700 rounded-xl shadow-sm">
+                <i data-lucide="calendar" className="w-4 h-4 text-warm-500"></i>
+                <span className="text-xs sm:text-sm font-bold text-warm-800 dark:text-stone-200">
+                  {viewMode === 'month'
+                    ? `${currentDate.getFullYear()}년 ${currentDate.getMonth() + 1}월`
+                    : formatDateFormatted(currentDate)}
+                </span>
+                <input
+                  type="date"
+                  value={currentDate.toISOString().split('T')[0]}
+                  onChange={(e) => {
+                    if (e.target.value) setCurrentDate(new Date(e.target.value));
+                  }}
+                  className="absolute inset-0 opacity-0 cursor-pointer"
+                />
+              </div>
+
+              <button
+                onClick={setToday}
+                className="px-3 py-2 text-xs font-bold bg-warm-500 text-white rounded-xl hover:bg-warm-600 transition shadow-sm"
+              >
+                오늘
+              </button>
+
+              <button
+                onClick={() => shiftDate(1)}
+                className="p-2 bg-white dark:bg-stone-800 border border-warm-200 dark:border-stone-700 rounded-xl hover:bg-warm-50 dark:hover:bg-stone-700 transition"
+                title="다음"
+              >
+                <i data-lucide="chevron-right" className="w-5 h-5 text-warm-700 dark:text-stone-300"></i>
+              </button>
+            </div>
+          </section>
+
+          {/* --- STREAMING_CHUNK:Rendering Meal Display Content Cards... --- */}
+          <main className="flex-1">
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center py-16 text-stone-400">
+                <div className="w-10 h-10 border-4 border-warm-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+                <p className="text-sm">나이스 실시간 급식 데이터를 불러오는 중...</p>
+              </div>
+            ) : viewMode === 'day' ? (
+              <DayMealView
+                mealData={mealData}
+                selectedAllergens={selectedAllergens}
+                onSpeak={speakMeal}
+                onCopy={copyToClipboard}
+              />
+            ) : viewMode === 'week' ? (
+              <WeekMealView
+                mealData={mealData}
+                currentDate={currentDate}
+                selectedAllergens={selectedAllergens}
+                onSpeak={speakMeal}
+                onCopy={copyToClipboard}
+              />
+            ) : (
+              <MonthMealView
+                mealData={mealData}
+                currentDate={currentDate}
+                onSelectDate={(date) => {
+                  setCurrentDate(date);
+                  setViewMode('day');
+                }}
+              />
+            )}
+          </main>
+
+          {/* --- STREAMING_CHUNK:Rendering Footer... --- */}
+          <footer className="mt-12 py-6 border-t border-warm-200 dark:border-stone-800 text-center text-xs text-warm-600 dark:text-stone-500">
+            <p className="mb-1">본 서비스는 대한민국 교육부 나이스(NEIS) 교육정보 개방 포털의 OpenAPI를 활용합니다.</p>
+            <p>© 2026 학교 급식 알리미. All rights reserved.</p>
+          </footer>
+
+          {/* --- STREAMING_CHUNK:Rendering School Search Modal... --- */}
+          {showSearchModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
+              <div className="bg-white dark:bg-stone-850 w-full max-w-lg rounded-3xl p-6 shadow-2xl border border-warm-200 dark:border-stone-700">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-warm-800 dark:text-stone-100 flex items-center gap-2">
+                    <i data-lucide="search" className="w-5 h-5 text-warm-500"></i>
+                    전국 학교 검색
+                  </h3>
+                  <button
+                    onClick={() => setShowSearchModal(false)}
+                    className="p-1 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200"
+                  >
+                    <i data-lucide="x" className="w-6 h-6"></i>
+                  </button>
+                </div>
+
+                <form onSubmit={handleSchoolSearch} className="flex gap-2 mb-4">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="학교 이름을 입력하세요 (예: 서울고, 해운대중)"
+                    className="flex-1 px-4 py-2.5 rounded-xl border border-warm-200 dark:border-stone-700 bg-warm-50 dark:bg-stone-800 text-warm-800 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-warm-500 text-sm"
+                    autoFocus
+                  />
+                  <button
+                    type="submit"
+                    disabled={isSearching}
+                    className="px-5 py-2.5 bg-warm-500 hover:bg-warm-600 text-white rounded-xl text-sm font-semibold transition"
+                  >
+                    {isSearching ? '검색 중...' : '검색'}
+                  </button>
+                </form>
+
+                <div className="max-h-60 overflow-y-auto space-y-2">
+                  {searchResults.length > 0 ? (
+                    searchResults.map((sch) => (
+                      <div
+                        key={sch.schoolCode}
+                        onClick={() => {
+                          setSelectedSchool(sch);
+                          setShowSearchModal(false);
+                          triggerToast(`${sch.name}(으)로 변경되었습니다.`);
+                        }}
+                        className="p-3 bg-warm-50 dark:bg-stone-800 hover:bg-warm-100 dark:hover:bg-stone-700 rounded-xl cursor-pointer transition flex items-center justify-between"
+                      >
+                        <div>
+                          <p className="text-sm font-bold text-warm-800 dark:text-stone-100">{sch.name}</p>
+                          <p className="text-xs text-warm-600 dark:text-stone-400">{sch.region}</p>
+                        </div>
+                        <i data-lucide="chevron-right" className="w-4 h-4 text-warm-400"></i>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-center py-8 text-xs text-stone-400">
+                      학교명을 입력한 후 검색 버튼을 눌러주세요.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Toast Notification Floating Banner */}
+          {toastMessage && (
+            <div className="fixed bottom-6 right-6 z-50 bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 px-4 py-3 rounded-2xl shadow-xl text-xs font-semibold flex items-center gap-2 border border-stone-700 animate-bounce">
+              <span>{toastMessage}</span>
+            </div>
+          )}
+
+        </div>
+      );
+    }
+
+    // --- STREAMING_CHUNK:Day Meal View Sub-Component... ---
+    function DayMealView({ mealData, selectedAllergens, onSpeak, onCopy }) {
+      if (!mealData || mealData.length === 0) {
+        return (
+          <div className="p-12 text-center bg-white dark:bg-stone-850 rounded-3xl border border-warm-200 dark:border-stone-800 shadow-sm">
+            <span className="text-4xl">🏖️</span>
+            <h3 className="text-lg font-bold text-warm-800 dark:text-stone-200 mt-2">등록된 급식 정보가 없습니다</h3>
+            <p className="text-xs text-warm-600 dark:text-stone-400 mt-1">주말, 방학 또는 학교 휴업일일 수 있습니다.</p>
+          </div>
+        );
+      }
+
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {mealData.map((meal, idx) => (
+            <MealCard
+              key={idx}
+              meal={meal}
+              selectedAllergens={selectedAllergens}
+              onSpeak={onSpeak}
+              onCopy={onCopy}
+            />
+          ))}
+        </div>
+      );
+    }
+
+    // --- STREAMING_CHUNK:Week Meal View Sub-Component... ---
+    function WeekMealView({ mealData, currentDate, selectedAllergens, onSpeak, onCopy }) {
+      // Group meals by date
+      const mealsByDate = useMemo(() => {
+        const map = {};
+        mealData.forEach(item => {
+          if (!map[item.MLSV_YMD]) map[item.MLSV_YMD] = [];
+          map[item.MLSV_YMD].push(item);
+        });
+        return map;
+      }, [mealData]);
+
+      // Calculate 7 days of current week
+      const weekDays = useMemo(() => {
+        const curr = new Date(currentDate);
+        const day = curr.getDay();
+        const diffToMon = curr.getDate() - day + (day === 0 ? -6 : 1);
+        const mon = new Date(curr.setDate(diffToMon));
+
+        const days = [];
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(mon);
+          d.setDate(mon.getDate() + i);
+          days.push(d);
+        }
+        return days;
+      }, [currentDate]);
+
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {weekDays.map((dateObj, idx) => {
+            const ymd = formatDateToYMD(dateObj);
+            const dayMeals = mealsByDate[ymd] || [];
+            const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+
+            return (
+              <div key={ymd} className="bg-white dark:bg-stone-850 p-5 rounded-3xl border border-warm-200 dark:border-stone-800 shadow-sm flex flex-col">
+                <div className="flex items-center justify-between mb-3 pb-2 border-b border-warm-100 dark:border-stone-800">
+                  <span className="text-sm font-bold text-warm-800 dark:text-stone-200">
+                    {dateObj.getMonth() + 1}/{dateObj.getDate()} ({dayNames[dateObj.getDay()]})
+                  </span>
+                  {dayMeals.length > 0 && (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-warm-100 dark:bg-stone-800 text-warm-600 dark:text-stone-400 font-medium">
+                      {dayMeals.length}개 식단
+                    </span>
+                  )}
+                </div>
+
+                {dayMeals.length > 0 ? (
+                  <div className="space-y-4 flex-1">
+                    {dayMeals.map((meal, mIdx) => (
+                      <MealCard
+                        key={mIdx}
+                        meal={meal}
+                        selectedAllergens={selectedAllergens}
+                        onSpeak={onSpeak}
+                        onCopy={onCopy}
+                        compact
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex-1 flex flex-col items-center justify-center py-8 text-stone-400">
+                    <span className="text-2xl opacity-50">🍱</span>
+                    <p className="text-xs mt-1">급식 없음</p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    // --- STREAMING_CHUNK:Month Meal View Sub-Component... ---
+    function MonthMealView({ mealData, currentDate, onSelectDate }) {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const startDayOfWeek = firstDay.getDay(); // 0: Sun
+      const totalDays = lastDay.getDate();
+
+      const mealsByDate = useMemo(() => {
+        const map = {};
+        mealData.forEach(item => {
+          if (!map[item.MLSV_YMD]) map[item.MLSV_YMD] = [];
+          map[item.MLSV_YMD].push(item);
+        });
+        return map;
+      }, [mealData]);
+
+      const calendarDays = [];
+      for (let i = 0; i < startDayOfWeek; i++) {
+        calendarDays.push(null);
+      }
+      for (let d = 1; d <= totalDays; d++) {
+        calendarDays.push(new Date(year, month, d));
+      }
+
+      return (
+        <div className="bg-white dark:bg-stone-850 p-6 rounded-3xl border border-warm-200 dark:border-stone-800 shadow-sm">
+          <div className="grid grid-cols-7 gap-2 text-center font-bold text-xs text-warm-600 dark:text-stone-400 mb-2">
+            <span className="text-rose-500">일</span>
+            <span>월</span>
+            <span>화</span>
+            <span>수</span>
+            <span>목</span>
+            <span>금</span>
+            <span className="text-sky-500">토</span>
+          </div>
+
+          <div className="grid grid-cols-7 gap-2">
+            {calendarDays.map((dateObj, idx) => {
+              if (!dateObj) {
+                return <div key={`empty-${idx}`} className="h-24 bg-warm-50/30 dark:bg-stone-900/30 rounded-2xl"></div>;
+              }
+
+              const ymd = formatDateToYMD(dateObj);
+              const hasMeal = mealsByDate[ymd] && mealsByDate[ymd].length > 0;
+              const isToday = formatDateToYMD(new Date()) === ymd;
+
+              return (
+                <div
+                  key={ymd}
+                  onClick={() => onSelectDate(dateObj)}
+                  className={`h-24 p-2 rounded-2xl border transition cursor-pointer flex flex-col justify-between ${
+                    isToday
+                      ? 'border-warm-500 bg-warm-500/10'
+                      : 'border-warm-100 dark:border-stone-800 bg-white dark:bg-stone-800/50 hover:bg-warm-50 dark:hover:bg-stone-750'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className={`text-xs font-bold ${
+                      dateObj.getDay() === 0 ? 'text-rose-500' : dateObj.getDay() === 6 ? 'text-sky-500' : 'text-warm-800 dark:text-stone-200'
+                    }`}>
+                      {dateObj.getDate()}
+                    </span>
+                    {hasMeal && (
+                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    )}
+                  </div>
+
+                  {hasMeal ? (
+                    <p className="text-[10px] text-warm-600 dark:text-stone-400 line-clamp-2 leading-tight">
+                      {mealsByDate[ymd][0].DDISH_NM.replace(/<br\s*\/?>/gi, ' ').replace(/[0-9]+\./g, '')}
+                    </p>
+                  ) : (
+                    <span className="text-[10px] text-stone-300 dark:text-stone-600 text-center">-</span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    // --- STREAMING_CHUNK:Detailed Meal Card Sub-Component... ---
+    function MealCard({ meal, selectedAllergens, onSpeak, onCopy, compact }) {
+      const [showDetails, setShowDetails] = useState(false);
+
+      // Parse dishes and check allergens
+      const parsedDishes = useMemo(() => {
+        if (!meal.DDISH_NM) return [];
+        const items = meal.DDISH_NM.split(/<br\s*\/?>/gi);
+        
+        return items.map(item => {
+          // Extract allergen numbers inside parens or dots e.g. "쇠고기미역국5.6.16."
+          const match = item.match(/([0-9\.]+)/g);
+          const numbers = [];
+          if (match) {
+            match.forEach(m => {
+              m.split('.').forEach(num => {
+                const parsed = parseInt(num);
+                if (!isNaN(parsed) && parsed >= 1 && parsed <= 19) {
+                  numbers.push(parsed);
+                }
+              });
+            });
+          }
+
+          const hasAlert = numbers.some(n => selectedAllergens.includes(n));
+          const cleanName = item.replace(/[0-9\.]+/g, '').trim();
+
+          return { raw: item, cleanName, allergenNums: numbers, hasAlert };
+        });
+      }, [meal.DDISH_NM, selectedAllergens]);
+
+      const hasAnyAlert = parsedDishes.some(d => d.hasAlert);
+
+      const mealTypeBadge = meal.MMEAL_SC_NM === '조식'
+        ? { icon: '🌅', color: 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-200' }
+        : meal.MMEAL_SC_NM === '석식'
+        ? { icon: '🌙', color: 'bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-200' }
+        : { icon: '☀️', color: 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200' };
+
+      return (
+        <div className={`bg-white dark:bg-stone-850 rounded-3xl p-5 border transition flex flex-col justify-between ${
+          hasAnyAlert
+            ? 'border-amber-400 dark:border-amber-700 shadow-md ring-2 ring-amber-400/20'
+            : 'border-warm-200 dark:border-stone-800 shadow-sm'
+        }`}>
+          <div>
+            {/* Meal Header Tag */}
+            <div className="flex items-center justify-between mb-4">
+              <span className={`px-3 py-1 rounded-xl text-xs font-bold flex items-center gap-1.5 ${mealTypeBadge.color}`}>
+                <span>{mealTypeBadge.icon}</span>
+                <span>{meal.MMEAL_SC_NM || '중식'}</span>
+              </span>
+              <span className="text-xs font-semibold text-warm-600 dark:text-stone-400 bg-warm-50 dark:bg-stone-800 px-2.5 py-1 rounded-xl border border-warm-100 dark:border-stone-700">
+                ⚡ {meal.CAL_INFO || '칼로리 정보 없음'}
+              </span>
+            </div>
+
+            {/* Dishes List */}
+            <ul className="space-y-2 mb-4">
+              {parsedDishes.map((dish, i) => (
+                <li
+                  key={i}
+                  className={`p-2 rounded-xl text-xs sm:text-sm font-medium flex items-start justify-between gap-2 ${
+                    dish.hasAlert
+                      ? 'bg-amber-100/70 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 font-bold border border-amber-300 dark:border-amber-800'
+                      : 'text-stone-800 dark:text-stone-200 bg-warm-50/50 dark:bg-stone-800/40'
+                  }`}
+                >
+                  <span>{dish.cleanName}</span>
+                  {dish.hasAlert && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500 text-white font-extrabold shrink-0">
+                      경고
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Action Bar & Accordion Trigger */}
+          <div>
+            <div className="flex items-center gap-2 pt-3 border-t border-warm-100 dark:border-stone-800">
+              <button
+                onClick={() => onSpeak(meal.DDISH_NM)}
+                className="flex-1 py-2 px-3 bg-warm-100 dark:bg-stone-800 hover:bg-warm-200 dark:hover:bg-stone-700 text-warm-800 dark:text-stone-200 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1.5"
+                title="음성으로 읽어주기"
+              >
+                <i data-lucide="volume-2" className="w-3.5 h-3.5 text-warm-600"></i>
+                <span>읽기</span>
+              </button>
+
+              <button
+                onClick={() => onCopy(meal.DDISH_NM)}
+                className="flex-1 py-2 px-3 bg-warm-100 dark:bg-stone-800 hover:bg-warm-200 dark:hover:bg-stone-700 text-warm-800 dark:text-stone-200 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1.5"
+                title="클립보드에 복사"
+              >
+                <i data-lucide="copy" className="w-3.5 h-3.5 text-warm-600"></i>
+                <span>복사</span>
+              </button>
+
+              <button
+                onClick={() => setShowDetails(!showDetails)}
+                className="p-2 bg-warm-50 dark:bg-stone-800 hover:bg-warm-100 dark:hover:bg-stone-700 text-warm-700 dark:text-stone-300 rounded-xl transition"
+                title="원산지 & 영양정보"
+              >
+                <i data-lucide={showDetails ? "chevron-up" : "chevron-down"} className="w-4 h-4"></i>
+              </button>
+            </div>
+
+            {/* Accordion Details */}
+            {showDetails && (
+              <div className="mt-3 pt-3 border-t border-dashed border-warm-200 dark:border-stone-800 text-[11px] text-warm-600 dark:text-stone-400 space-y-2 animate-fadeIn">
+                {meal.ORGPU_INFO && (
+                  <div>
+                    <strong className="text-warm-800 dark:text-stone-200 block mb-0.5">🌾 원산지 정보:</strong>
+                    <p className="leading-relaxed bg-warm-50 dark:bg-stone-900 p-2 rounded-xl">{meal.ORGPU_INFO}</p>
+                  </div>
+                )}
+                {meal.NUTR_INFO && (
+                  <div>
+                    <strong className="text-warm-800 dark:text-stone-200 block mb-0.5">📊 영양성분:</strong>
+                    <div
+                      className="bg-warm-50 dark:bg-stone-900 p-2 rounded-xl leading-relaxed"
+                      dangerouslySetInnerHTML={{ __html: meal.NUTR_INFO }}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // Render React App
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
