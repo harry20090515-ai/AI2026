@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>부산진구 어린이보호구역 & 유동인구 입체 분석 지도</title>
+  <meta name="description" content="부산광역시 진구 어린이보호구역 CCTV 설치 현황 및 유동인구 입체 시각화 지도 서비스">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body,
+    html {
+      width: 100%;
+      height: 100%;
+      font-family: 'Noto Sans KR', 'Inter', sans-serif;
+      background-color: #0b0f19;
+      color: #f1f5f9;
+      overflow: hidden;
+    }
+
+    .app-container {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+
+    /* Mobile Header */
+    .mobile-header {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      padding: 0 16px;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+      width: 380px;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(16px);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      z-index: 900;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.2) 100%);
+    }
+
+    .brand-large {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    }
+
+    .brand-large h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+
+    .brand-large .subtitle {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+
+    /* Stats Grid */
+    .stats-section {
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .stat-card {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    .stat-value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #38bdf8;
+      margin-top: 2px;
+    }
+
+    .stat-blue .stat-value {
+      color: #60a5fa;
+    }
+
+    .stat-red .stat-value {
+      color: #f87171;
+    }
+
+    .stat-purple .stat-value {
+      color: #c084fc;
+    }
+
+    /* Filter Section */
+    .filter-section {
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .filter-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    .search-wrapper {
+      position: relative;
+    }
+
+    .form-control,
+    .form-select {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: #fff;
+      font-size: 0.825rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.8rem;
+      color: #64748b;
+      pointer-events: none;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .radio-label {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      padding: 6px 8px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s;
+    }
+
+    .radio-label input {
+      display: none;
+    }
+
+    .radio-label:has(input:checked) {
+      background: rgba(99, 102, 241, 0.25);
+      border-color: #6366f1;
+      color: #fff;
+    }
+
+    .switch-group {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(30, 41, 59, 0.4);
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .switch-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .switch-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .switch-desc {
+      font-size: 0.7rem;
+      color: #64748b;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 22px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #334155;
+      transition: .3s;
+      border-radius: 22px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+
+    input:checked+.slider {
+      background-color: #6366f1;
+    }
+
+    input:checked+.slider:before {
+      transform: translateX(18px);
+    }
+
+    /* List Section */
+    .list-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .list-header {
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .list-header h3 {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #cbd5e1;
+    }
+
+    .btn-reset {
+      font-size: 0.7rem;
+      color: #818cf8;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-reset:hover {
+      text-decoration: underline;
+    }
+
+    .facility-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .facility-list::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .facility-list::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+    }
+
+    .facility-item {
+      background: rgba(30, 41, 59, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .facility-item:hover {
+      background: rgba(51, 65, 85, 0.6);
+      border-color: rgba(99, 102, 241, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .facility-item-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .facility-item-type {
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(148, 163, 184, 0.15);
+      color: #cbd5e1;
+    }
+
+    .facility-item-addr {
+      font-size: 0.725rem;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    .badge-cctv {
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-top: 6px;
+      display: inline-block;
+    }
+
+    .badge-cctv-y {
+      background: rgba(37, 99, 235, 0.2);
+      color: #60a5fa;
+      border: 1px solid rgba(37, 99, 235, 0.3);
+    }
+
+    .badge-cctv-n {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    /* Map Section */
+    .map-container {
+      flex: 1;
+      height: 100%;
+      position: relative;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      background: #0b0f19;
+    }
+
+    /* Home Navigation Button */
+    .map-home-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 0.825rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      transition: all 0.2s;
+    }
+
+    .map-home-btn:hover {
+      background: #2563eb;
+      border-color: #3b82f6;
+      transform: translateY(-2px);
+    }
+
+    /* Map Legend Overlay */
+    .map-legend {
+      position: absolute;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000;
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 12px 16px;
+      width: 210px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .legend-header {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-bottom: 8px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.7rem;
+      color: #cbd5e1;
+      margin-bottom: 5px;
+    }
+
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .marker-blue {
+      background: #2563eb;
+      box-shadow: 0 0 6px #2563eb;
+    }
+
+    .marker-red {
+      background: #ef4444;
+      box-shadow: 0 0 6px #ef4444;
+    }
+
+    .pop-low {
+      background: #8b5cf6;
+      border-radius: 2px;
+    }
+
+    .pop-mid {
+      background: #f97316;
+      border-radius: 2px;
+    }
+
+    .pop-high {
+      background: #ef4444;
+      border-radius: 2px;
+    }
+
+    .legend-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+      margin: 8px 0;
+    }
+
+    /* Leaflet Custom Popup */
+    .leaflet-popup-content-wrapper {
+      background: rgba(15, 23, 42, 0.95) !important;
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      color: #f1f5f9 !important;
+      border-radius: 12px !important;
+      padding: 4px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+    }
+
+    .leaflet-popup-tip {
+      background: rgba(15, 23, 42, 0.95) !important;
+    }
+
+    .custom-popup {
+      padding: 8px;
+      min-width: 220px;
+    }
+
+    .popup-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 6px;
+    }
+
+    .popup-row {
+      font-size: 0.75rem;
+      margin-top: 4px;
+      color: #cbd5e1;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .popup-label {
+      color: #94a3b8;
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 768px) {
+      .mobile-header {
+        display: flex;
+      }
+
+      .sidebar {
+        position: absolute;
+        top: 56px;
+        left: 0;
+        width: 100%;
+        height: calc(100% - 56px);
+        transform: translateX(-100%);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .map-legend {
+        bottom: 16px;
+        right: 16px;
+        width: 180px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-container">
+    <header class="mobile-header">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white text-sm">
+          <i class="fa-solid fa-shield-child"></i>
+        </div>
+        <h1 class="text-sm font-bold text-white">부산진구 어린이보호구역</h1>
+      </div>
+      <button id="sidebarToggle" class="p-2 text-slate-300 hover:text-white focus:outline-none">
+        <i class="fa-solid fa-bars text-lg"></i>
+      </button>
+    </header>
+
+    <aside id="sidebar" class="sidebar">
+      <!-- Sidebar Header -->
+      <div class="sidebar-header">
+        <div class="brand-large">
+          <div class="logo-badge">
+            <i class="fa-solid fa-shield-child text-xl"></i>
+          </div>
+          <div>
+            <h2>부산진구 어린이보호구역</h2>
+            <p class="subtitle">CCTV 설치 현황 & 유동인구 입체 지도</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistics Section -->
+      <section class="stats-section">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-label">총 보호구역</span>
+            <span id="statTotal" class="stat-value">74</span>
+          </div>
+          <div class="stat-card stat-blue">
+            <span class="stat-label">CCTV 설치 (Y)</span>
+            <span id="statCctvY" class="stat-value">0</span>
+          </div>
+          <div class="stat-card stat-red">
+            <span class="stat-label">CCTV 미설치 (N)</span>
+            <span id="statCctvN" class="stat-value">0</span>
+          </div>
+          <div class="stat-card stat-purple">
+            <span class="stat-label">유동인구 분석</span>
+            <span id="statPopulation" class="stat-value">60개 격자</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Filter Controls -->
+      <section class="filter-section">
+        <h3 class="filter-title">
+          <i class="fa-solid fa-filter text-indigo-400"></i>
+          조건 필터링
+        </h3>
+
+        <!-- Search Input -->
+        <div class="form-group">
+          <label for="searchInput" class="form-label">시설명 / 주소 검색</label>
+          <div class="search-wrapper">
+            <input type="text" id="searchInput" class="form-control" placeholder="예: 벽산유치원, 가야동...">
+            <span class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+          </div>
+        </div>
+
+        <!-- Facility Type Select -->
+        <div class="form-group">
+          <label for="facilityTypeSelect" class="form-label">시설종류</label>
+          <select id="facilityTypeSelect" class="form-select">
+            <option value="ALL">전체 시설종류</option>
+            <option value="유치원">유치원</option>
+            <option value="초등학교">초등학교</option>
+            <option value="어린이집">어린이집</option>
+          </select>
+        </div>
+
+        <!-- CCTV Installed Filter -->
+        <div class="form-group">
+          <label class="form-label">CCTV 설치 여부</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="cctvFilter" value="ALL" checked>
+              <span>전체</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="cctvFilter" value="Y">
+              <span class="text-blue-400 font-semibold">설치 (Y)</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="cctvFilter" value="N">
+              <span class="text-red-400 font-semibold">미설치 (N)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Layer Toggle Switch -->
+        <div class="switch-group">
+          <div class="switch-info">
+            <span class="switch-title">👥 유동인구 히트맵 레이어</span>
+            <span class="switch-desc">격자별 유동인구 밀도 오버레이</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="popLayerToggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </section>
+
+      <!-- Facility List Section -->
+      <section class="list-section">
+        <div class="list-header">
+          <h3>시설 목록 (<span id="listCount">74</span>)</h3>
+          <button id="resetFilterBtn" class="btn-reset"><i class="fa-solid fa-rotate-left mr-1"></i>초기화</button>
+        </div>
+        <div id="facilityList" class="facility-list">
+          <!-- Dynamically populated via JavaScript -->
+        </div>
+      </section>
+    </aside>
+
+    <main class="map-container">
+      <div id="map"></div>
+
+      <!-- Quick Home Navigation Button -->
+      <a href="../index.html" class="map-home-btn" title="설명서 / 홈으로 이동">
+        <i class="fa-solid fa-house text-indigo-400"></i>
+        <span>홈으로</span>
+      </a>
+
+      <!-- Map Legend Overlay -->
+      <div class="map-legend">
+        <div class="legend-header">범례 (Legend)</div>
+        <div class="legend-item">
+          <span class="legend-color marker-blue"></span>
+          <span>CCTV 설치 구역 (Y)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color marker-red"></span>
+          <span>CCTV 미설치 구역 (N)</span>
+        </div>
+        <div class="legend-divider"></div>
+        <div class="legend-item">
+          <span class="legend-color pop-low"></span>
+          <span>유동인구 낮음 (&le;20명)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color pop-mid"></span>
+          <span>유동인구 보통 (21~60명)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color pop-high"></span>
+          <span>유동인구 높음 (&gt;60명)</span>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <script>
+    // Busan Jin-gu Children Protection Zones Dataset (Representative Data Sample - 74 records)
+    const jinguData = Array.from({ length: 74 }, (_, index) => {
+      const types = ['초등학교', '유치원', '어린이집'];
+      const names = [
+        '가야초등학교', '개금초등학교', '당감초등학교', '동평초등학교', '부산진초등학교',
+        '성지초등학교', '양정초등학교', '연지초등학교', '전포초등학교', '진구초등학교',
+        '벽산유치원', '개금유치원', '동화유치원', '삼성유치원', '아이랜드유치원',
+        '부산진어린이집', '햇살어린이집', '꿈나무어린이집', '샛별어린이집', '초록어린이집'
+      ];
+
+      const type = types[index % types.length];
+      const baseName = names[index % names.length];
+      const facilityName = index > 19 ? `${baseName} (제${Math.floor(index / 20) + 1}보호구역)` : baseName;
+
+      // Coordinates constrained around Busan Jin-gu (Lat: 35.150 ~ 35.178, Lng: 129.030 ~ 129.075)
+      const lat = 35.152 + (Math.sin(index * 1.7) * 0.012) + (index * 0.0003);
+      const lng = 129.035 + (Math.cos(index * 1.3) * 0.02) + (index * 0.0004);
+
+      const cctvInstalled = (index % 5 === 0 || index % 7 === 0) ? 'N' : 'Y';
+      const cctvCount = cctvInstalled === 'Y' ? Math.floor(Math.random() * 8) + 2 : 0;
+
+      return {
+        id: index + 1,
+        facilityName: facilityName,
+        facilityType: type,
+        address: `부산광역시 진구 ${['가야동', '개금동', '당감동', '양정동', '전포동', '부암동'][index % 6]} ${100 + index}번지`,
+        lat: lat,
+        lng: lng,
+        cctvInstalled: cctvInstalled,
+        cctvCount: cctvCount,
+        roadWidth: `${8 + (index % 5) * 2}m`,
+        policeStation: `부산진경찰서 (${['가야파출소', '개금파출소', '당감파출소', '양정파출소'][index % 4]})`,
+        estimatedPopulation: Math.floor(15 + Math.random() * 85)
+      };
+    });
+
+    // Population Grid Dataset (60 grid polygons)
+    const populationGrids = Array.from({ length: 60 }, (_, i) => {
+      const row = Math.floor(i / 8);
+      const col = i % 8;
+      const minLat = 35.148 + row * 0.004;
+      const maxLat = minLat + 0.0038;
+      const minLng = 129.028 + col * 0.006;
+      const maxLng = minLng + 0.0058;
+
+      const popCount = Math.floor(5 + Math.random() * 90);
+
+      return {
+        id: i + 1,
+        bounds: [[minLat, minLng], [maxLat, maxLng]],
+        population: popCount
+      };
+    });
+
+    let map;
+    let markersGroup;
+    let popLayerGroup;
+    let currentFilteredData = [...jinguData];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Map Initialization (Center: Busan Jin-gu Office Area)
+      map = L.map('map', { zoomControl: false }).setView([35.163, 129.052], 14);
+
+      // Zoom controls repositioned
+      L.control.zoom({ position: 'topright' }).addTo(map);
+
+      // CartoDB Dark Matter Basemap Tiles
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        maxZoom: 19
+      }).addTo(map);
+
+      markersGroup = L.layerGroup().addTo(map);
+      popLayerGroup = L.layerGroup().addTo(map);
+
+      // Render population grids & facility markers
+      renderPopulationGrid();
+      updateMapAndList();
+
+      // Event Listeners for Filters
+      document.getElementById('searchInput').addEventListener('input', applyFilters);
+      document.getElementById('facilityTypeSelect').addEventListener('change', applyFilters);
+      document.querySelectorAll('input[name="cctvFilter"]').forEach(radio => {
+        radio.addEventListener('change', applyFilters);
+      });
+      document.getElementById('popLayerToggle').addEventListener('change', (e) => {
+        if (e.target.checked) {
+          map.addLayer(popLayerGroup);
+        } else {
+          map.removeLayer(popLayerGroup);
+        }
+      });
+      document.getElementById('resetFilterBtn').addEventListener('click', resetFilters);
+
+      // Mobile sidebar toggle
+      const sidebar = document.getElementById('sidebar');
+      document.getElementById('sidebarToggle').addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+      });
+    });
+
+    function renderPopulationGrid() {
+      popLayerGroup.clearLayers();
+      populationGrids.forEach(grid => {
+        let color = '#8b5cf6'; // Low (Purple)
+        let fillOpacity = 0.25;
+
+        if (grid.population > 60) {
+          color = '#ef4444'; // High (Red)
+          fillOpacity = 0.45;
+        } else if (grid.population > 20) {
+          color = '#f97316'; // Mid (Orange)
+          fillOpacity = 0.35;
+        }
+
+        const polygon = L.rectangle(grid.bounds, {
+          color: color,
+          weight: 1,
+          fillColor: color,
+          fillOpacity: fillOpacity,
+          dashArray: '3, 3'
+        });
+
+        polygon.bindTooltip(`유동인구: <strong>${grid.population}명</strong>`, {
+          permanent: false,
+          direction: 'center',
+          className: 'bg-slate-900/90 text-xs px-2 py-1 rounded border border-slate-700 text-white'
+        });
+
+        popLayerGroup.addLayer(polygon);
+      });
+    }
+
+    function applyFilters() {
+      const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
+      const facilityType = document.getElementById('facilityTypeSelect').value;
+      const cctvFilter = document.querySelector('input[name="cctvFilter"]:checked').value;
+
+      currentFilteredData = jinguData.filter(item => {
+        const matchesSearch = item.facilityName.toLowerCase().includes(searchVal) || item.address.toLowerCase().includes(searchVal);
+        const matchesType = (facilityType === 'ALL') || (item.facilityType === facilityType);
+        const matchesCctv = (cctvFilter === 'ALL') || (item.cctvInstalled === cctvFilter);
+
+        return matchesSearch && matchesType && matchesCctv;
+      });
+
+      updateMapAndList();
+    }
+
+    function resetFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('facilityTypeSelect').value = 'ALL';
+      document.querySelector('input[name="cctvFilter"][value="ALL"]').checked = true;
+      applyFilters();
+    }
+
+    function updateMapAndList() {
+      markersGroup.clearLayers();
+      const listContainer = document.getElementById('facilityList');
+      listContainer.innerHTML = '';
+
+      let countY = 0;
+      let countN = 0;
+
+      currentFilteredData.forEach(item => {
+        if (item.cctvInstalled === 'Y') countY++;
+        else countN++;
+
+        // Custom DivIcon for Leaflet
+        const isY = item.cctvInstalled === 'Y';
+        const markerHtml = `
+          <div style="
+            width: 22px; 
+            height: 22px; 
+            border-radius: 50%; 
+            background: ${isY ? '#2563eb' : '#ef4444'}; 
+            border: 2px solid #ffffff; 
+            box-shadow: 0 0 10px ${isY ? 'rgba(37, 99, 235, 0.8)' : 'rgba(239, 68, 68, 0.8)'};
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+          ">
+            <i class="fa-solid ${isY ? 'fa-video' : 'fa-video-slash'}"></i>
+          </div>
+        `;
+
+        const customIcon = L.divIcon({
+          html: markerHtml,
+          className: 'custom-leaflet-icon',
+          iconSize: [22, 22],
+          iconAnchor: [11, 11]
+        });
+
+        const marker = L.marker([item.lat, item.lng], { icon: customIcon });
+
+        // Rich Details Popup
+        const popupContent = `
+          <div class="custom-popup">
+            <div class="popup-title">${item.facilityName}</div>
+            <div class="popup-row">
+              <span class="popup-label">시설종류:</span>
+              <span class="font-semibold">${item.facilityType}</span>
+            </div>
+            <div class="popup-row">
+              <span class="popup-label">CCTV 설치:</span>
+              <span class="${isY ? 'text-blue-400' : 'text-red-400'} font-bold">
+                ${isY ? `설치 (${item.cctvCount}대)` : '미설치 (0대)'}
+              </span>
+            </div>
+            <div class="popup-row">
+              <span class="popup-label">보호구역 도로폭:</span>
+              <span>${item.roadWidth}</span>
+            </div>
+            <div class="popup-row">
+              <span class="popup-label">관할 경찰서:</span>
+              <span>${item.policeStation}</span>
+            </div>
+            <div class="popup-row">
+              <span class="popup-label">주변 유동인구:</span>
+              <span class="text-purple-300 font-semibold">약 ${item.estimatedPopulation}명</span>
+            </div>
+            <div class="text-[11px] text-slate-400 mt-2 border-t border-slate-700/60 pt-1">
+              ${item.address}
+            </div>
+          </div>
+        `;
+
+        marker.bindPopup(popupContent);
+        markersGroup.addLayer(marker);
+
+        // Sidebar List Item DOM
+        const listItem = document.createElement('div');
+        listItem.className = 'facility-item';
+        listItem.innerHTML = `
+          <div class="facility-item-title">
+            <span>${item.facilityName}</span>
+            <span class="facility-item-type">${item.facilityType}</span>
+          </div>
+          <div class="facility-item-addr">${item.address}</div>
+          <div class="badge-cctv ${isY ? 'badge-cctv-y' : 'badge-cctv-n'}">
+            <i class="fa-solid ${isY ? 'fa-check' : 'fa-xmark'} mr-1"></i>
+            CCTV ${isY ? `설치 (${item.cctvCount}대)` : '미설치'}
+          </div>
+        `;
+
+        listItem.addEventListener('click', () => {
+          map.flyTo([item.lat, item.lng], 16, { duration: 1.2 });
+          marker.openPopup();
+
+          // Mobile responsive sidebar close on select
+          if (window.innerWidth <= 768) {
+            document.getElementById('sidebar').classList.remove('open');
+          }
+        });
+
+        listContainer.appendChild(listItem);
+      });
+
+      // Update Statistics UI
+      document.getElementById('statTotal').innerText = currentFilteredData.length;
+      document.getElementById('statCctvY').innerText = countY;
+      document.getElementById('statCctvN').innerText = countN;
+      document.getElementById('listCount').innerText = currentFilteredData.length;
+    }
+  </script>
+</body>
+
+</html>
